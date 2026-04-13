@@ -595,20 +595,8 @@ async function doSignup(){
   var succ  = document.getElementById('login-success');
   var btn   = document.getElementById('btn-signup');
 
-  if(!email || !pass){
-    err.textContent = 'Please enter your email and choose a password.';
-    err.style.display='block'; return;
-  }
-  if(pass.length < 8){
-    err.textContent = 'Password must be at least 8 characters.';
-    err.style.display='block'; return;
-  }
-  if(!/[A-Z]/.test(pass)){
-    err.textContent = 'Password must contain at least 1 capital letter.';
-    err.style.display='block'; return;
-  }
-  if(!/[!@#$%^&*()_+\-=\[\]{};':"\|,.<>\/?]/.test(pass)){
-    err.textContent = 'Password must contain at least 1 special character (!@#$% etc).';
+  if(!email){
+    err.textContent = 'Please enter your email address.';
     err.style.display='block'; return;
   }
 
