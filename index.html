@@ -223,7 +223,7 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
           <span style="font-size:10px;color:var(--text-dim);">Can't log in?</span>
           <button onclick="setAuthMode('forgot')" style="background:none;border:1px solid var(--border-bright);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:4px 10px;cursor:pointer;">Reset Password</button>
         </div>
-        <div style="font-size:10px;color:var(--text-dim);">or contact the investigator: <a href="/cdn-cgi/l/email-protection#7c050f1f1d12081015121b511e150e1f143c1f190e1d52130e1b521d09" style="color:var(--accent);text-decoration:none;">yscantling-birch&#64;cera.org.au</a></div>
+        <div style="font-size:10px;color:var(--text-dim);">or contact the investigator: <a href="mailto:yscantling-birch&#64;cera.org.au" style="color:var(--accent);text-decoration:none;">yscantling-birch&#64;cera.org.au</a></div>
       </div>
     </div>
 
@@ -459,10 +459,10 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
 </div>
 
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ── SUPABASE CONFIG ────────────────────────────────────────
 const SUPABASE_URL = 'https://sxvwlyqsyenpflobgbpl.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_D4gMTff_QzC5-KAd4vozZA_Vh8fs7NI';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4dndseXFzeWVucGZsb2JnYnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTQyOTYsImV4cCI6MjA5MTYzMDI5Nn0.34V1EsA815PNlj49w4r9GTfMLjOMhzmXUQ1Fii9Dkn0';
 const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let supabaseSession = null;
 
@@ -606,11 +606,11 @@ async function doSignup(){
   // Check whitelist first
   try {
     var wlResp = await fetch(SUPABASE_URL + '/rest/v1/approved_emails?email=eq.' + encodeURIComponent(email) + '&select=email', {
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      headers: { 'apikey': SUPABASE_ANON_KEY }
     });
     var wlData = await wlResp.json();
     if(!wlData || wlData.length === 0){
-      err.innerHTML = 'This email address is not registered for this study.<br>Please contact <a href="mailto:yscantling-birch@cera.org.au" style="color:var(--accent);">Dr Y Scantling-Birch</a> to request access.';
+      err.innerHTML = 'This email address is not registered for this study.<br>Please contact <a href="mailto:yscantling-birch&#64;cera.org.au" style="color:var(--accent);">Dr Y Scantling-Birch</a> to request access.';
       err.style.display='block';
       btn.textContent = 'Register →'; btn.disabled = false;
       return;
@@ -625,7 +625,7 @@ async function doSignup(){
   // Check if email already registered
   try {
     var checkResp = await fetch(SUPABASE_URL + '/rest/v1/reader_registry?email=eq.' + encodeURIComponent(email) + '&select=reader_id', {
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      headers: { 'apikey': SUPABASE_ANON_KEY }
     });
     var existing = await checkResp.json();
     if(existing && existing.length > 0){
