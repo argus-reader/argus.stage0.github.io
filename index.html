@@ -615,7 +615,12 @@ async function doSignup(){
       btn.textContent = 'Register →'; btn.disabled = false;
       return;
     }
-  } catch(e){ console.warn('Whitelist check:', e); }
+  } catch(e){
+    err.textContent = 'Unable to verify registration status. Please try again.';
+    err.style.display='block';
+    btn.textContent = 'Register →'; btn.disabled = false;
+    return;
+  }
 
   // Check if email already registered
   try {
@@ -671,6 +676,20 @@ async function doSignup(){
       body: JSON.stringify({ reader_id: autoRid, email: email })
     });
   } catch(e){ console.warn('Registry insert failed:', e); }
+
+  // Update approved_emails with assigned Reader ID
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/approved_emails?email=eq.' + encodeURIComponent(email), {
+      method: 'PATCH',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Prefer':        'return=minimal'
+      },
+      body: JSON.stringify({ reader_id: autoRid })
+    });
+  } catch(e){ console.warn('Approved emails update failed:', e); }
 
   succ.innerHTML = '✓ Registration successful! Your Reader ID is: <strong style="color:var(--accent);font-size:14px;">' + autoRid + '</strong><br><br>Please note this ID — you will need it to log in. A verification email has been sent to <strong>' + email + '</strong>. Please verify before logging in.';
   succ.style.display='block';
