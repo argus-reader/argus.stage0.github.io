@@ -1132,6 +1132,7 @@ function commitGrade(caseId,score){
 // ── SUPABASE SUBMIT ────────────────────────────────────────
 async function submitToGoogleSheets(caseId, score){
   var payload = {
+    user_id:                 supabaseSession ? supabaseSession.user.id : null,
     reader_id:               readerId,
     session:                 currentSession,
     case_id:                 caseId,
