@@ -603,6 +603,20 @@ async function doSignup(){
   btn.textContent = 'Checking...'; btn.disabled = true;
   err.style.display = 'none';
 
+  // Check whitelist first
+  try {
+    var wlResp = await fetch(SUPABASE_URL + '/rest/v1/approved_emails?email=eq.' + encodeURIComponent(email) + '&select=email', {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    var wlData = await wlResp.json();
+    if(!wlData || wlData.length === 0){
+      err.innerHTML = 'This email address is not registered for this study.<br>Please contact <a href="mailto:yscantling-birch@cera.org.au" style="color:var(--accent);">Dr Y Scantling-Birch</a> to request access.';
+      err.style.display='block';
+      btn.textContent = 'Register →'; btn.disabled = false;
+      return;
+    }
+  } catch(e){ console.warn('Whitelist check:', e); }
+
   // Check if email already registered
   try {
     var checkResp = await fetch(SUPABASE_URL + '/rest/v1/reader_registry?email=eq.' + encodeURIComponent(email) + '&select=reader_id', {
