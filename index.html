@@ -209,7 +209,7 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
 
     <div id="signup-fields">
       <label class="field-label" for="reader-email">Email Address</label>
-      <input class="field-input" type="email" id="reader-email" placeholder="e.g. yourname@gmail.com" autocomplete="off" style="margin-bottom:20px;">
+      <input class="field-input" type="email" id="reader-email" placeholder="and yourname@gmail.com" autocomplete="off" style="margin-bottom:20px;">
       <p style="font-size:10px;color:var(--text-dim);margin-bottom:20px;">Your unique Reader ID will be provided upon registration. No password required.</p>
       <button class="btn-primary" id="btn-signup" onclick="doSignup()">Register &rarr;</button>
     </div>
@@ -218,21 +218,17 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
       <label class="field-label" for="reader-id-signin">Reader ID</label>
       <input class="field-input" type="text" id="reader-id-signin" placeholder="e.g. ARGUS001" autocomplete="off">
       <label class="field-label" for="signin-email">Email Address</label>
-      <input class="field-input" type="email" id="signin-email" placeholder="e.g. yourname@gmail.com" autocomplete="off" style="margin-bottom:20px;">
+      <input class="field-input" type="email" id="signin-email" placeholder="and yourname@gmail.com" autocomplete="off" style="margin-bottom:20px;">
       <button class="btn-primary" id="btn-signin" onclick="doSignin()">Begin Study &rarr;</button>
       <div style="text-align:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
-        <div style="display:flex;justify-content:center;align-items:center;gap:6px;margin-bottom:6px;">
-          <span style="font-size:10px;color:var(--text-dim);">Can't log in?</span>
-          <button onclick="setAuthMode('forgot')" style="background:none;border:1px solid var(--border-bright);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:4px 10px;cursor:pointer;">Reset Password</button>
-        </div>
-        <div style="font-size:10px;color:var(--text-dim);">or contact the investigator: <a href="mailto:yscantling-birch&#64;cera.org.au" style="color:var(--accent);text-decoration:none;">yscantling-birch&#64;cera.org.au</a></div>
+        <div style="font-size:10px;color:var(--text-dim);">Having trouble? Contact: <a href="mailto:yscantling-birch&#64;cera.org.au" style="color:var(--accent);text-decoration:none;">yscantling-birch&#64;cera.org.au</a></div>
       </div>
     </div>
 
     <div id="forgot-fields" style="display:none;">
       <p style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:16px;">Enter your email address and we will send you a password reset link.</p>
       <label class="field-label" for="forgot-email">Email Address</label>
-      <input class="field-input" type="email" id="forgot-email" placeholder="e.g. yourname@gmail.com" autocomplete="off" style="margin-bottom:20px;">
+      <input class="field-input" type="email" id="forgot-email" placeholder="and yourname@gmail.com" autocomplete="off" style="margin-bottom:20px;">
       <button class="btn-primary" id="btn-forgot" onclick="doForgotPassword()">Send Reset Link &rarr;</button>
       <div style="text-align:center;margin-top:12px;">
         <button onclick="setAuthMode('signin')" style="background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:10px;letter-spacing:.08em;cursor:pointer;text-decoration:underline;">Back to login</button>
@@ -354,13 +350,13 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         <div class="slider-wrap">
           <div class="slider-track">
             <div class="slider-fill" id="slider-fill" style="width:50%;background:#6b7585"></div>
-            <input type="range" class="risk-slider" id="risk-slider" min="0" max="100" step="5" value="50" oninput="updateSlider(this.value, true)">
+            <input type="range" class="risk-slider" id="risk-slider" min="0" max="100" step="5" value="55" oninput="updateSlider(this.value, true)">
           </div>
         </div>
         <div class="slider-ticks" id="slider-ticks"></div>
         <div class="slider-scale">
           <span>0 — Definitely absent</span>
-          <span>50 — Uncertain</span>
+          <span>45 / 55</span>
           <span>100 — Definite</span>
         </div>
         <div class="manual-input-row">
@@ -693,7 +689,7 @@ async function doSignup(){
     });
   } catch(e){ console.warn('Approved emails update failed:', e); }
 
-  succ.innerHTML = '✓ Registration successful! Your Reader ID is: <strong style="color:var(--accent);font-size:14px;">' + autoRid + '</strong><br><br>Please note this ID — you will need it to log in. A verification email has been sent to <strong>' + email + '</strong>. Please verify before logging in.';
+  succ.innerHTML = '✓ Registration successful! Your Reader ID is: <strong style="color:var(--accent);font-size:14px;">' + autoRid + '</strong><br><br>You will need both your ARGUS ID (<strong style="color:var(--accent);">' + autoRid + '</strong>) and your email address (<strong>' + email + '</strong>) to log in. Please keep these safe.';
   succ.style.display='block';
 }
 
@@ -1050,8 +1046,14 @@ function resetZoom(){
 // ── SLIDER ─────────────────────────────────────────────────
 function updateSlider(val, fromUser){
   val=Math.round(parseInt(val)/5)*5;
-  if(isNaN(val))val=50;
+  if(isNaN(val))val=55;
   if(val<0)val=0; if(val>100)val=100;
+  // Skip 50 — round to nearest valid value
+  if(val===50){
+    // Check which direction slider was moving
+    var prev = parseInt(document.getElementById('risk-slider').value)||55;
+    val = prev < 50 ? 45 : 55;
+  }
   document.getElementById('risk-slider').value=val;
 
   if(fromUser) sliderTouched = true;
