@@ -216,7 +216,9 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
 
     <div id="signin-fields" style="display:none;">
       <label class="field-label" for="reader-id-signin">Reader ID</label>
-      <input class="field-input" type="text" id="reader-id-signin" placeholder="e.g. ARGUS001" autocomplete="off" style="margin-bottom:20px;">
+      <input class="field-input" type="text" id="reader-id-signin" placeholder="e.g. ARGUS001" autocomplete="off">
+      <label class="field-label" for="signin-email">Email Address</label>
+      <input class="field-input" type="email" id="signin-email" placeholder="e.g. yourname@gmail.com" autocomplete="off" style="margin-bottom:20px;">
       <button class="btn-primary" id="btn-signin" onclick="doSignin()">Begin Study &rarr;</button>
       <div style="text-align:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
         <div style="display:flex;justify-content:center;align-items:center;gap:6px;margin-bottom:6px;">
@@ -696,17 +698,38 @@ async function doSignup(){
 }
 
 async function doSignin(){
-  var rid  = document.getElementById('reader-id-signin').value.trim().toUpperCase();
-  var err  = document.getElementById('login-error');
-  var btn  = document.getElementById('btn-signin');
+  var rid   = document.getElementById('reader-id-signin').value.trim().toUpperCase();
+  var email = document.getElementById('signin-email').value.trim().toLowerCase();
+  var err   = document.getElementById('login-error');
+  var btn   = document.getElementById('btn-signin');
 
-  if(!rid){
-    err.textContent = 'Please enter your Reader ID.';
+  if(!rid || !email){
+    err.textContent = 'Please enter both your Reader ID and email address.';
     err.style.display='block'; return;
   }
 
-  btn.textContent = 'Signing in...'; btn.disabled = true;
+  btn.textContent = 'Verifying...'; btn.disabled = true;
   err.style.display = 'none';
+
+  // Verify email matches Reader ID in registry
+  try {
+    var verifyResp = await fetch(SUPABASE_URL + '/rest/v1/reader_registry?reader_id=eq.' + encodeURIComponent(rid) + '&select=email', {
+      headers: { 'apikey': SUPABASE_ANON_KEY }
+    });
+    var verifyData = await verifyResp.json();
+    if(!verifyData || verifyData.length === 0){
+      err.textContent = 'Reader ID not found. Please check your ID or register first.';
+      err.style.display='block';
+      btn.textContent = 'Begin Study →'; btn.disabled = false;
+      return;
+    }
+    if(verifyData[0].email.toLowerCase() !== email){
+      err.textContent = 'Email address does not match this Reader ID.';
+      err.style.display='block';
+      btn.textContent = 'Begin Study →'; btn.disabled = false;
+      return;
+    }
+  } catch(e){ console.warn('Verify:', e); }
 
   // Look up email from reader_id stored in user metadata
   // Sign in requires email - we store reader_id in metadata at signup
