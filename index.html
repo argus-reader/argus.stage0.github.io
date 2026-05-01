@@ -77,7 +77,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .image-panel::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.6) 100%);pointer-events:none;z-index:1;}
 .case-image{max-width:90%;max-height:90%;object-fit:contain;display:block;border:1px solid var(--border);transform-origin:center;cursor:grab;user-select:none;}
 .case-image:active{cursor:grabbing;}
-.case-pdf{width:100%;height:100%;border:none;display:block;background:#fff;position:absolute;top:0;left:0;}
+.case-pdf{width:90%;height:90%;border:1px solid var(--border);display:block;background:#fff;}
 .image-placeholder{display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--text-dim);}
 .image-placeholder svg{opacity:.3;}
 .image-placeholder p{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);}
@@ -638,28 +638,9 @@ async function doSignup(){
   btn.textContent = 'Registering...';
   err.style.display = 'none';
 
-  // Auto-generate Reader ID via direct counter increment
-  var autoRid = 'ARGUS001';
-  try {
-    // Get current counter value
-    var cntResp = await fetch(SUPABASE_URL + '/rest/v1/reader_counter?id=eq.1&select=last_number', {
-      headers: { 'apikey': SUPABASE_ANON_KEY }
-    });
-    var cntData = await cntResp.json();
-    var nextNum = (cntData[0].last_number || 0) + 1;
-    autoRid = 'ARGUS' + String(nextNum).padStart(3, '0');
-
-    // Increment counter
-    await fetch(SUPABASE_URL + '/rest/v1/reader_counter?id=eq.1', {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_ANON_KEY,
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({ last_number: nextNum })
-    });
-  } catch(e){ console.warn('Counter increment failed:', e); }
+  // Auto-generate Reader ID via Supabase RPC
+  var ridResult = await sbClient.rpc('generate_reader_id');
+  var autoRid = ridResult.data || ('ARGUS' + String(Math.floor(Math.random()*900)+100));
 
   var result = await sbClient.auth.signUp({
     email: email,
@@ -979,11 +960,7 @@ function loadCase(idx){
     var isPDF = c.imageUrl.toLowerCase().includes('.pdf');
     if(isPDF){
       img.style.display='none';
-      // Session A/C = Traditional OCT (Zeiss) → 25% zoom
-      // Session B/D = AI-based OCT → full size, no toolbar
-      var isTraditional = (currentSession === 'A' || currentSession === 'C');
-      var pdfParams = isTraditional ? '#zoom=25&toolbar=0&navpanes=0&scrollbar=0' : '#toolbar=0&navpanes=0&scrollbar=0';
-      pdf.src=c.imageUrl + pdfParams; pdf.style.display='block';
+      pdf.src=c.imageUrl; pdf.style.display='block';
     } else {
       pdf.style.display='none';
       img.src=c.imageUrl; img.style.display='block';
