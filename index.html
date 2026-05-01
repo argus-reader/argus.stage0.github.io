@@ -979,7 +979,11 @@ function loadCase(idx){
     var isPDF = c.imageUrl.toLowerCase().includes('.pdf');
     if(isPDF){
       img.style.display='none';
-      pdf.src=c.imageUrl + '#zoom=25&toolbar=0&navpanes=0&scrollbar=0'; pdf.style.display='block';
+      // Session A/C = Traditional OCT (Zeiss) → 25% zoom
+      // Session B/D = AI-based OCT → full size, no toolbar
+      var isTraditional = (currentSession === 'A' || currentSession === 'C');
+      var pdfParams = isTraditional ? '#zoom=25&toolbar=0&navpanes=0&scrollbar=0' : '#toolbar=0&navpanes=0&scrollbar=0';
+      pdf.src=c.imageUrl + pdfParams; pdf.style.display='block';
     } else {
       pdf.style.display='none';
       img.src=c.imageUrl; img.style.display='block';
