@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><!-- ARGUS_Stage_0 v1.0 -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ARGUS Stage 0</title>
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -727,23 +727,9 @@ async function doSignin(){
     }
   } catch(e){ console.warn('Verify:', e); }
 
-  // Look up email from reader_id stored in user metadata
-  // Sign in requires email - we store reader_id in metadata at signup
-  // Use a Supabase Edge Function or RPC to look up email by reader_id
-  // For now, ask reader to enter email on first signin
-  // Alternative: store reader_id->email mapping in a public lookup table
-  var result = await sbClient.rpc('get_email_by_reader_id', { p_reader_id: rid });
-
-  if(result.error || !result.data){
-    err.textContent = 'Reader ID not found. Please check your ID or create an account.';
-    err.style.display='block';
-    btn.textContent = 'Begin Study →'; btn.disabled = false;
-    return;
-  }
-
-  var email = result.data;
-  var pass = email + '_stage0_argus';
-  var signIn = await sbClient.auth.signInWithPassword({ email: email, password: pass });
+  // Use email typed by reader directly
+  var pass = email.toLowerCase() + '_stage0_argus';
+  var signIn = await sbClient.auth.signInWithPassword({ email: email.toLowerCase(), password: pass });
 
   btn.textContent = 'Begin Study →'; btn.disabled = false;
 
