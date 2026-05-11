@@ -16,14 +16,14 @@
   --mono:'DM Mono',monospace;--serif:'Fraunces',Georgia,serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;width:100%;overflow:hidden;}#login-screen{overflow-y:auto;}
+html,body{height:100%;width:100%;}
 body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(74,240,196,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(74,240,196,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 .screen{display:none;position:relative;z-index:1;}
 .screen.active{display:flex;}
 
 /* ── LOGIN ── */
-#login-screen{min-height:100vh;width:100vw;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 20px;overflow-y:auto;}
+#login-screen{min-height:100vh;width:100vw;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 20px;overflow-y:auto;box-sizing:border-box;}
 .login-box{width:100%;max-width:460px;border:1px solid var(--border-bright);background:var(--surface);padding:48px 40px;position:relative;animation:fadeUp .5s ease both;}
 .login-box::before{content:'';position:absolute;top:-1px;left:-1px;right:-1px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
 .study-badge{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:flex;align-items:center;justify-content:center;gap:8px;}
@@ -77,7 +77,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .image-panel::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.6) 100%);pointer-events:none;z-index:1;}
 .case-image{max-width:90%;max-height:90%;object-fit:contain;display:block;border:1px solid var(--border);transform-origin:center;cursor:grab;user-select:none;}
 .case-image:active{cursor:grabbing;}
-.case-pdf{width:100%;height:100%;border:none;display:block;background:#fff;position:absolute;top:0;left:0;}.case-pdf-ai{width:auto;max-width:100%;height:100%;position:absolute;top:0;left:50%;transform:translateX(-50%);border:none;display:block;background:#fff;}
+.case-pdf{width:100%;height:100%;border:none;display:block;background:#fff;position:absolute;top:0;left:0;}
 .image-placeholder{display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--text-dim);}
 .image-placeholder svg{opacity:.3;}
 .image-placeholder p{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);}
@@ -332,16 +332,11 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         <div class="case-overlay-id">Case ID</div>
         <div class="case-overlay-num" id="overlay-case-id">--</div>
       </div>
-      <div class="zoom-controls" id="img-zoom-controls">
+      <div class="zoom-controls">
         <button class="zoom-btn" onclick="adjustZoom(.2)" title="Zoom in">+</button>
         <button class="zoom-btn" onclick="adjustZoom(-.2)" title="Zoom out">-</button>
         <button class="zoom-btn" onclick="resetZoom()" style="font-size:11px" title="Reset zoom">Reset</button>
         <span class="drag-hint" id="drag-hint" style="display:none;">&#9002; drag to pan</span>
-      </div>
-      <div class="zoom-controls" id="pdf-zoom-controls" style="display:none;">
-        <button class="zoom-btn" onclick="adjustPdfZoom(0.1)" title="Zoom in">+</button>
-        <button class="zoom-btn" onclick="adjustPdfZoom(-0.1)" title="Zoom out">−</button>
-        <button class="zoom-btn" onclick="resetPdfZoom()" style="font-size:11px" title="Reset zoom">Reset</button>
       </div>
       <img class="case-image" id="case-image" src="" alt="Fundus" style="display:none">
       <embed class="case-pdf" id="case-pdf" src="" type="application/pdf" style="display:none">
@@ -565,7 +560,6 @@ let currentIndex = 0;
 let readerId = '';
 let responses = { A:{}, B:{}, C:{}, D:{} };
 let zoomLevel = 1;
-let pdfZoomLevel = 1.0;
 let pendingGrade = null;
 let isPanning = false, panStartX = 0, panStartY = 0, panOffsetX = 0, panOffsetY = 0;
 let sessionStartTime = null;
@@ -688,48 +682,6 @@ async function doSignup(){
       body: JSON.stringify({ last_number: nextNum })
     });
   } catch(e){ console.warn('Counter increment failed:', e); }
-
-  // Check if ghost account exists in Auth but not registry
-  // Try signing in first - if it works, account exists as ghost
-  var ghostCheck = await sbClient.auth.signInWithPassword({ email: email, password: pass });
-  if(!ghostCheck.error && ghostCheck.data.session){
-    // Ghost account found - sign out and delete via admin workaround
-    await sbClient.auth.signOut();
-    // Account exists in Auth but not registry - treat as new registration
-    // Update metadata with new Reader ID
-    var updateResult = await sbClient.auth.signInWithPassword({ email: email, password: pass });
-    if(updateResult.data.session){
-      supabaseSession = updateResult.data.session;
-      // Insert into registry
-      try {
-        await fetch(SUPABASE_URL + '/rest/v1/reader_registry', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': 'Bearer ' + updateResult.data.session.access_token,
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({ reader_id: autoRid, email: email })
-        });
-        await fetch(SUPABASE_URL + '/rest/v1/approved_emails?email=eq.' + encodeURIComponent(email), {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': 'Bearer ' + updateResult.data.session.access_token,
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({ reader_id: autoRid })
-        });
-      } catch(e){ console.warn('Ghost account registry fix failed:', e); }
-      await sbClient.auth.signOut();
-      btn.textContent = 'Register →'; btn.disabled = false;
-      succ.innerHTML = '✓ Registration successful! Your ARGUS ID is: <strong style="color:var(--accent);font-size:14px;">' + autoRid + '</strong><br><br>You will need both your ARGUS ID (<strong style="color:var(--accent);">' + autoRid + '</strong>) and your email address (<strong>' + email + '</strong>) to log in. Please keep these safe.';
-      succ.style.display='block';
-      return;
-    }
-  }
 
   var result = await sbClient.auth.signUp({
     email: email,
@@ -1051,25 +1003,10 @@ function loadCase(idx){
       img.style.display='none';
       var isTraditional = (currentSession === 'A' || currentSession === 'C');
       var pdfParams = isTraditional ? '#zoom=25&toolbar=0&navpanes=0&scrollbar=0' : '#toolbar=0&navpanes=0&scrollbar=0';
-      pdf.src=c.imageUrl + pdfParams;
-      // Centre AI sessions
-      if(!isTraditional){
-        pdf.className = 'case-pdf case-pdf-ai';
-        pdf.style.width = 'auto';
-      } else {
-        pdf.className = 'case-pdf';
-        pdf.style.width = '100%';
-      }
-      pdf.style.display='block';
-      // Show PDF zoom controls, hide image zoom
-      document.getElementById('img-zoom-controls').style.display = 'none';
-      document.getElementById('pdf-zoom-controls').style.display = 'flex';
-      pdfZoomLevel = 1.0;
+      pdf.src=c.imageUrl + pdfParams; pdf.style.display='block';
     } else {
       pdf.style.display='none';
       img.src=c.imageUrl; img.style.display='block';
-      document.getElementById('img-zoom-controls').style.display = 'flex';
-      document.getElementById('pdf-zoom-controls').style.display = 'none';
     }
     ph.style.display='none';
   } else {
