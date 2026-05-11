@@ -77,7 +77,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .image-panel::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.6) 100%);pointer-events:none;z-index:1;}
 .case-image{max-width:90%;max-height:90%;object-fit:contain;display:block;border:1px solid var(--border);transform-origin:center;cursor:grab;user-select:none;}
 .case-image:active{cursor:grabbing;}
-.case-pdf{width:100%;height:100%;border:none;display:block;background:#fff;position:absolute;top:0;left:0;}
+.case-pdf{width:100%;height:100%;border:none;display:block;background:#fff;position:absolute;top:0;left:0;}.case-pdf-ai{width:auto;max-width:100%;height:100%;position:absolute;top:0;left:50%;transform:translateX(-50%);border:none;display:block;background:#fff;}
 .image-placeholder{display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--text-dim);}
 .image-placeholder svg{opacity:.3;}
 .image-placeholder p{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);}
@@ -332,11 +332,16 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         <div class="case-overlay-id">Case ID</div>
         <div class="case-overlay-num" id="overlay-case-id">--</div>
       </div>
-      <div class="zoom-controls">
+      <div class="zoom-controls" id="img-zoom-controls">
         <button class="zoom-btn" onclick="adjustZoom(.2)" title="Zoom in">+</button>
         <button class="zoom-btn" onclick="adjustZoom(-.2)" title="Zoom out">-</button>
         <button class="zoom-btn" onclick="resetZoom()" style="font-size:11px" title="Reset zoom">Reset</button>
         <span class="drag-hint" id="drag-hint" style="display:none;">&#9002; drag to pan</span>
+      </div>
+      <div class="zoom-controls" id="pdf-zoom-controls" style="display:none;">
+        <button class="zoom-btn" onclick="adjustPdfZoom(0.1)" title="Zoom in">+</button>
+        <button class="zoom-btn" onclick="adjustPdfZoom(-0.1)" title="Zoom out">−</button>
+        <button class="zoom-btn" onclick="resetPdfZoom()" style="font-size:11px" title="Reset zoom">Reset</button>
       </div>
       <img class="case-image" id="case-image" src="" alt="Fundus" style="display:none">
       <embed class="case-pdf" id="case-pdf" src="" type="application/pdf" style="display:none">
@@ -560,6 +565,7 @@ let currentIndex = 0;
 let readerId = '';
 let responses = { A:{}, B:{}, C:{}, D:{} };
 let zoomLevel = 1;
+let pdfZoomLevel = 1.0;
 let pendingGrade = null;
 let isPanning = false, panStartX = 0, panStartY = 0, panOffsetX = 0, panOffsetY = 0;
 let sessionStartTime = null;
@@ -1001,14 +1007,27 @@ function loadCase(idx){
     var isPDF = c.imageUrl.toLowerCase().includes('.pdf');
     if(isPDF){
       img.style.display='none';
-      // Session A/C = Traditional OCT (Zeiss) → 25% zoom
-      // Session B/D = AI-based OCT → full size, no toolbar
       var isTraditional = (currentSession === 'A' || currentSession === 'C');
       var pdfParams = isTraditional ? '#zoom=25&toolbar=0&navpanes=0&scrollbar=0' : '#toolbar=0&navpanes=0&scrollbar=0';
-      pdf.src=c.imageUrl + pdfParams; pdf.style.display='block';
+      pdf.src=c.imageUrl + pdfParams;
+      // Centre AI sessions
+      if(!isTraditional){
+        pdf.className = 'case-pdf case-pdf-ai';
+        pdf.style.width = 'auto';
+      } else {
+        pdf.className = 'case-pdf';
+        pdf.style.width = '100%';
+      }
+      pdf.style.display='block';
+      // Show PDF zoom controls, hide image zoom
+      document.getElementById('img-zoom-controls').style.display = 'none';
+      document.getElementById('pdf-zoom-controls').style.display = 'flex';
+      pdfZoomLevel = 1.0;
     } else {
       pdf.style.display='none';
       img.src=c.imageUrl; img.style.display='block';
+      document.getElementById('img-zoom-controls').style.display = 'flex';
+      document.getElementById('pdf-zoom-controls').style.display = 'none';
     }
     ph.style.display='none';
   } else {
