@@ -566,7 +566,7 @@ let sessionStartTime = null;
 let caseStartTime = null;
 let sliderTouched = false;
 
-function ts(){ return new Date().toISOString(); }
+function ts(){ return new Date().toLocaleString('en-AU', { timeZone: 'Australia/Melbourne', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false }); }
 
 document.addEventListener('DOMContentLoaded', async function(){
   document.getElementById('case-count-display').textContent = 40+40+480+480;
