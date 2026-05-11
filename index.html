@@ -689,6 +689,48 @@ async function doSignup(){
     });
   } catch(e){ console.warn('Counter increment failed:', e); }
 
+  // Check if ghost account exists in Auth but not registry
+  // Try signing in first - if it works, account exists as ghost
+  var ghostCheck = await sbClient.auth.signInWithPassword({ email: email, password: pass });
+  if(!ghostCheck.error && ghostCheck.data.session){
+    // Ghost account found - sign out and delete via admin workaround
+    await sbClient.auth.signOut();
+    // Account exists in Auth but not registry - treat as new registration
+    // Update metadata with new Reader ID
+    var updateResult = await sbClient.auth.signInWithPassword({ email: email, password: pass });
+    if(updateResult.data.session){
+      supabaseSession = updateResult.data.session;
+      // Insert into registry
+      try {
+        await fetch(SUPABASE_URL + '/rest/v1/reader_registry', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': 'Bearer ' + updateResult.data.session.access_token,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ reader_id: autoRid, email: email })
+        });
+        await fetch(SUPABASE_URL + '/rest/v1/approved_emails?email=eq.' + encodeURIComponent(email), {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': 'Bearer ' + updateResult.data.session.access_token,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ reader_id: autoRid })
+        });
+      } catch(e){ console.warn('Ghost account registry fix failed:', e); }
+      await sbClient.auth.signOut();
+      btn.textContent = 'Register →'; btn.disabled = false;
+      succ.innerHTML = '✓ Registration successful! Your ARGUS ID is: <strong style="color:var(--accent);font-size:14px;">' + autoRid + '</strong><br><br>You will need both your ARGUS ID (<strong style="color:var(--accent);">' + autoRid + '</strong>) and your email address (<strong>' + email + '</strong>) to log in. Please keep these safe.';
+      succ.style.display='block';
+      return;
+    }
+  }
+
   var result = await sbClient.auth.signUp({
     email: email,
     password: pass,
