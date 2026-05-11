@@ -661,13 +661,19 @@ async function doSignup(){
   err.style.display = 'none';
 
   // Auto-generate Reader ID via direct counter increment
-  var autoRid = 'ARGUS001';
+  var autoRid = null;
   try {
     // Get current counter value
     var cntResp = await fetch(SUPABASE_URL + '/rest/v1/reader_counter?id=eq.1&select=last_number', {
-      headers: { 'apikey': SUPABASE_ANON_KEY }
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
     });
     var cntData = await cntResp.json();
+    if(!cntData || !cntData[0]){
+      err.textContent = 'Unable to assign Reader ID. Please try again.';
+      err.style.display='block';
+      btn.textContent = 'Register →'; btn.disabled = false;
+      return;
+    }
     var nextNum = (cntData[0].last_number || 0) + 1;
     autoRid = 'ARGUS' + String(nextNum).padStart(3, '0');
 
@@ -677,11 +683,17 @@ async function doSignup(){
       headers: {
         'Content-Type': 'application/json',
         'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
         'Prefer': 'return=minimal'
       },
       body: JSON.stringify({ last_number: nextNum })
     });
-  } catch(e){ console.warn('Counter increment failed:', e); }
+  } catch(e){
+    err.textContent = 'Unable to assign Reader ID. Please try again.';
+    err.style.display='block';
+    btn.textContent = 'Register →'; btn.disabled = false;
+    return;
+  }
 
   var result = await sbClient.auth.signUp({
     email: email,
