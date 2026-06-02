@@ -217,7 +217,7 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
       <p style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center;margin-bottom:4px;">A Video Guide to the Reader Platform</p>
       <p style="font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:10px;">Please review this video prior to any reader sessions.</p>
       <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid var(--border);">
-        <iframe src="https://www.youtube.com/embed/h3YhF-XVGbQ?modestbranding=1&rel=0&color=white"
+        <iframe src="https://www.youtube.com/embed/h3YhF-XVGbQ?modestbranding=1&rel=0&color=white&vq=hd1080"
           style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
@@ -236,7 +236,7 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
       <p style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center;margin-bottom:4px;">A Video Guide to the Reader Platform</p>
       <p style="font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:10px;">Please review this video prior to any reader sessions.</p>
       <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid var(--border);">
-        <iframe src="https://www.youtube.com/embed/h3YhF-XVGbQ?modestbranding=1&rel=0&color=white"
+        <iframe src="https://www.youtube.com/embed/h3YhF-XVGbQ?modestbranding=1&rel=0&color=white&vq=hd1080"
           style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
@@ -358,13 +358,43 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
     <div class="grading-panel">
       <div class="g-section">
         <div class="sec-label">Task</div>
-        <div class="grading-title">Likelihood of Glaucomatous Visual Field Defect</div>
-        <div class="grading-instr">Rate the likelihood of a glaucomatous visual field defect from 0% (definitely absent) to 100% (definitely present), in 5% increments.</div>
+        <div class="grading-title">Clinical Assessment</div>
+        <div class="grading-instr">Rate each question from 0% (definitely absent) to 100% (definitely present), in 5% increments. All three responses are required before submission.</div>
         <div class="resp-status not-rec" id="resp-status">No response recorded</div>
       </div>
 
+      <!-- Q1: Structural Damage -->
       <div class="likelihood-section">
-        <div class="sec-label">Likelihood Score</div>
+        <div class="sec-label">1 — Likelihood of Glaucomatous Structural Damage</div>
+        <div class="lh-value-row">
+          <div class="lh-number" id="lh-display-struct" style="color:var(--text-dim);">—</div>
+          <div class="lh-pct" id="lh-pct-struct" style="visibility:hidden;">%</div>
+          <div class="lh-label" id="lh-label-struct" style="visibility:hidden;"></div>
+        </div>
+        <div class="slider-wrap">
+          <div class="slider-track">
+            <div class="slider-fill" id="slider-fill-struct" style="width:50%;background:#6b7585"></div>
+            <input type="range" class="risk-slider" id="risk-slider-struct" min="0" max="100" step="5" value="55" oninput="updateSlider2(this.value, true)">
+          </div>
+        </div>
+        <div class="slider-ticks" id="slider-ticks-struct"></div>
+        <div class="slider-scale">
+          <span>0 — Definitely absent</span>
+          <span>45 / 55</span>
+          <span>100 — Definite</span>
+        </div>
+        <div class="manual-input-row">
+          <span class="manual-input-label">Manual entry:</span>
+          <input type="number" class="manual-score-input" id="manual-score-struct" min="0" max="100" step="1" value="" placeholder="—" oninput="onManualInput2(this.value)" onblur="onManualBlur2(this.value)" onkeydown="onManualKeydown2(event)">
+          <span class="manual-hint" id="manual-hint-struct">0–100</span>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin:12px 0;"></div>
+
+      <!-- Q2: Visual Field Defect -->
+      <div class="likelihood-section">
+        <div class="sec-label">2 — Likelihood of Glaucomatous Visual Field Defect</div>
         <div class="lh-value-row">
           <div class="lh-number" id="lh-display" style="color:var(--text-dim);">—</div>
           <div class="lh-pct" id="lh-pct" style="visibility:hidden;">%</div>
@@ -387,6 +417,18 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
           <input type="number" class="manual-score-input" id="manual-score" min="0" max="100" step="1" value="" placeholder="—" oninput="onManualInput(this.value)" onblur="onManualBlur(this.value)" onkeydown="onManualKeydown(event)">
           <span class="manual-hint" id="manual-hint">0–100</span>
         </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin:12px 0;"></div>
+
+      <!-- Q3: Visual Field Test -->
+      <div class="likelihood-section">
+        <div class="sec-label">3 — Would you order a visual field test?</div>
+        <div style="display:flex;gap:12px;margin-top:10px;">
+          <button id="btn-vf-yes" onclick="setVFTest(true)" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;">Yes</button>
+          <button id="btn-vf-no" onclick="setVFTest(false)" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;">No</button>
+        </div>
+        <div id="vf-hint" style="font-size:10px;color:var(--text-dim);margin-top:6px;">Please select Yes or No</div>
       </div>
 
       <div class="nav-section">
@@ -565,12 +607,14 @@ let isPanning = false, panStartX = 0, panStartY = 0, panOffsetX = 0, panOffsetY 
 let sessionStartTime = null;
 let caseStartTime = null;
 let sliderTouched = false;
+let vfTestAnswer = null;
 
 function ts(){ return new Date().toLocaleString('en-AU', { timeZone: 'Australia/Melbourne', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false }); }
 
 document.addEventListener('DOMContentLoaded', async function(){
   document.getElementById('case-count-display').textContent = 40+40+480+480;
   buildTicks();
+  buildTicksFor('slider-ticks-struct');
   var emailEl = document.getElementById('reader-email');
   if(emailEl) emailEl.addEventListener('keydown', function(e){ if(e.key==='Enter') doSignup(); });
   var passEl = document.getElementById('study-password-signin');
@@ -1002,6 +1046,8 @@ function loadCase(idx){
   currentIndex = idx;
   caseStartTime = ts();
   sliderTouched = false;
+  sliderTouched2 = false;
+  vfTestAnswer = null;
   var c = CASES[idx];
   document.getElementById('overlay-case-id').textContent = c.id;
   panOffsetX=0; panOffsetY=0; zoomLevel=1;
@@ -1035,6 +1081,8 @@ function loadCase(idx){
     updateSlider(sv, true);
   } else {
     sliderTouched = false;
+  sliderTouched2 = false;
+  vfTestAnswer = null;
     document.getElementById('risk-slider').value = 50;
     document.getElementById('manual-score').value = '';
     document.getElementById('lh-display').textContent = '—';
@@ -1172,6 +1220,93 @@ function onManualKeydown(e){
   }
 }
 
+// ── STRUCTURAL DAMAGE SLIDER ───────────────────────────────
+var sliderTouched2 = false;
+
+function updateSlider2(val, fromUser){
+  val=Math.round(parseInt(val)/5)*5;
+  if(isNaN(val))val=55;
+  if(val<0)val=0; if(val>100)val=100;
+  if(val===50){ var prev=parseInt(document.getElementById('risk-slider-struct').value)||55; val=prev<50?45:55; }
+  document.getElementById('risk-slider-struct').value=val;
+  if(fromUser) sliderTouched2=true;
+  if(sliderTouched2){
+    document.getElementById('lh-display-struct').textContent=val;
+    document.getElementById('lh-pct-struct').style.visibility='visible';
+    document.getElementById('lh-label-struct').style.visibility='visible';
+    document.getElementById('manual-score-struct').value=val;
+    document.getElementById('slider-fill-struct').style.width=val+'%';
+    var color,label;
+    if(val<=45){color='#4af09a';label=val===0?'Definitely absent':val<=10?'Very unlikely':'Low likelihood';}
+    else if(val<=69){color='#f0a44a';label=val<50?'Leaning absent':'Leaning present';}
+    else{color='#f06060';label=val>=90?'Definite defect':'High likelihood';}
+    document.getElementById('slider-fill-struct').style.background=color;
+    document.getElementById('lh-display-struct').style.color=color;
+    document.getElementById('lh-label-struct').textContent=label;
+    document.getElementById('lh-label-struct').style.color=color;
+  } else {
+    document.getElementById('lh-display-struct').textContent='—';
+    document.getElementById('lh-display-struct').style.color='var(--text-dim)';
+    document.getElementById('slider-fill-struct').style.width='50%';
+    document.getElementById('slider-fill-struct').style.background='var(--border-bright)';
+  }
+}
+
+function onManualInput2(val){
+  var n=parseInt(val);
+  var hint=document.getElementById('manual-hint-struct');
+  if(isNaN(n)||val===''||val==='-'){ hint.textContent='0–100'; hint.style.color='var(--text-dim)'; return; }
+  if(n<0)n=0; if(n>100)n=100;
+  var rounded=Math.round(n/5)*5;
+  var str=String(val).trim();
+  if(str.length>=2||(str.length===1&&n%5===0)){
+    if(n%5!==0){ hint.textContent=n+' → rounds to '+rounded; hint.style.color='var(--warn)'; }
+    else { hint.textContent='0–100'; hint.style.color='var(--text-dim)'; }
+    updateSlider2(rounded,true);
+  } else { hint.textContent='0–100'; hint.style.color='var(--text-dim)'; }
+}
+
+function onManualBlur2(val){
+  var n=parseInt(val);
+  if(isNaN(n)||val==='') return;
+  n=Math.round(n/5)*5;
+  if(n<0)n=0; if(n>100)n=100;
+  document.getElementById('manual-score-struct').value=n;
+  document.getElementById('manual-hint-struct').textContent='0–100';
+  document.getElementById('manual-hint-struct').style.color='var(--text-dim)';
+  sliderTouched2=true;
+  updateSlider2(n,true);
+}
+
+function onManualKeydown2(e){
+  if(e.key==='Enter'){
+    onManualBlur2(document.getElementById('manual-score-struct').value);
+    document.getElementById('manual-score-struct').blur();
+  }
+}
+
+function setVFTest(val){
+  vfTestAnswer = val;
+  var yes = document.getElementById('btn-vf-yes');
+  var no  = document.getElementById('btn-vf-no');
+  var hint = document.getElementById('vf-hint');
+  if(val){
+    yes.style.background = 'var(--accent)';
+    yes.style.color = '#000';
+    no.style.background = 'transparent';
+    no.style.color = 'var(--text-muted)';
+    hint.textContent = 'Visual field test: Yes';
+    hint.style.color = 'var(--accent)';
+  } else {
+    no.style.background = 'var(--accent)';
+    no.style.color = '#000';
+    yes.style.background = 'transparent';
+    yes.style.color = 'var(--text-muted)';
+    hint.textContent = 'Visual field test: No';
+    hint.style.color = 'var(--accent)';
+  }
+}
+
 // ── NAVIGATION ─────────────────────────────────────────────
 function navigate(dir){
   var ni=currentIndex+dir;
@@ -1194,8 +1329,20 @@ function updateProgress(){
 
 // ── SUBMIT ─────────────────────────────────────────────────
 function attemptSubmit(){
+  if(!sliderTouched2){
+    document.getElementById('login-error').textContent = 'Please score Question 1 (Structural Damage) before submitting.';
+    document.getElementById('login-error').style.display = 'block';
+    setTimeout(function(){ document.getElementById('login-error').style.display='none'; }, 3000);
+    return;
+  }
   if(!sliderTouched){
-    document.getElementById('login-error').textContent = 'Please move the slider to record a score.';
+    document.getElementById('login-error').textContent = 'Please score Question 2 (Visual Field Defect) before submitting.';
+    document.getElementById('login-error').style.display = 'block';
+    setTimeout(function(){ document.getElementById('login-error').style.display='none'; }, 3000);
+    return;
+  }
+  if(vfTestAnswer === null){
+    document.getElementById('login-error').textContent = 'Please answer Question 3 (Visual Field Test) before submitting.';
     document.getElementById('login-error').style.display = 'block';
     setTimeout(function(){ document.getElementById('login-error').style.display='none'; }, 3000);
     return;
@@ -1232,12 +1379,15 @@ function commitGrade(caseId,score){
 
 // ── SUPABASE SUBMIT ────────────────────────────────────────
 async function submitToGoogleSheets(caseId, score){
+  var scoreStruct = Math.round(parseInt(document.getElementById('risk-slider-struct').value)/5)*5;
   var payload = {
     user_id:                 supabaseSession ? supabaseSession.user.id : null,
     reader_id:               readerId,
     session:                 currentSession,
     case_id:                 caseId,
+    structural_score:        scoreStruct,
     likelihood_score:        score,
+    vf_test_ordered:         vfTestAnswer,
     timestamp_submitted:     ts(),
     timestamp_case_start:    caseStartTime,
     timestamp_session_start: sessionStartTime
