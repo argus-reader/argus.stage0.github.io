@@ -191,6 +191,12 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
 .survey-footer-note{font-size:10px;color:var(--text-dim);line-height:1.5;flex:1;}
 .btn-survey-done{background:var(--accent);color:#000;border:none;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:10px 20px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;}
 .btn-survey-done:hover{background:#fff;}
+.sv-q{margin-bottom:20px;}
+.sv-label{display:block;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);margin-bottom:8px;line-height:1.5;}
+.sv-input{width:100%;background:var(--surface2);border:1px solid var(--border-bright);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 12px;box-sizing:border-box;}
+.sv-input:focus{outline:none;border-color:var(--accent);}
+.sv-check{display:flex;align-items:flex-start;gap:8px;font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5;cursor:pointer;}
+.sv-check input{margin-top:2px;flex-shrink:0;accent-color:var(--accent);}
 </style>
 </head>
 <body>
@@ -499,24 +505,72 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         <div class="survey-modal-subtitle">Please complete the brief survey below before beginning the study.</div>
       </div>
     </div>
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:40px;">
-      <div style="text-align:center;">
-        <div style="font-family:var(--serif);font-size:22px;font-weight:300;color:var(--text);margin-bottom:8px;">Pre-Study Survey</div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.7;max-width:440px;">Please complete the brief survey before beginning. It will open in a new tab — return to this window when finished and click the button below.</div>
+    <div style="flex:1;overflow-y:auto;padding:28px 32px;">
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.7;margin-bottom:24px;">All questions except your Reader Number are optional. Your responses are stored securely against your Reader ID for research purposes.</div>
+
+      <!-- Q1 ARGUS number (auto-filled, read-only) -->
+      <div class="sv-q">
+        <label class="sv-label">1. Your ARGUS Reader Study Number <span style="color:var(--accent);">*</span></label>
+        <input type="text" id="sv-reader-id" class="sv-input" readonly style="opacity:.7;cursor:not-allowed;">
       </div>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdj6mS5r2vaj5PItt_-JKKe1nPaI2ss0-9cfBA-JksHC6DtCA/viewform" target="_blank"
-        style="display:inline-flex;align-items:center;gap:10px;background:var(--accent);color:#000;border:none;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:14px 28px;cursor:pointer;text-decoration:none;transition:all .2s;"
-        onmouseover="this.style.background='#fff'" onmouseout="this.style.background='var(--accent)'">
-        &#128196; Open Survey in New Tab
-      </a>
-      <div style="font-size:10px;color:var(--text-dim);text-align:center;">The survey opens separately — your grading session remains open in this tab.</div>
+
+      <!-- Q2 Age -->
+      <div class="sv-q">
+        <label class="sv-label">2. What is your age?</label>
+        <select id="sv-age" class="sv-input">
+          <option value="">— Select —</option>
+          <option>20–25</option><option>26–30</option><option>31–35</option><option>36–40</option>
+          <option>41–45</option><option>46–50</option><option>51–55</option><option>56–60</option>
+          <option>61–65</option><option>66–70</option><option>71–75</option><option>76–80</option>
+        </select>
+      </div>
+
+      <!-- Q3 Gender -->
+      <div class="sv-q">
+        <label class="sv-label">3. What is your gender?</label>
+        <select id="sv-gender" class="sv-input">
+          <option value="">— Select —</option>
+          <option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option>
+        </select>
+      </div>
+
+      <!-- Q4 Highest degree -->
+      <div class="sv-q">
+        <label class="sv-label">4. What is your highest degree?</label>
+        <select id="sv-degree" class="sv-input" onchange="document.getElementById('sv-degree-other').style.display = this.value==='Other' ? 'block' : 'none';">
+          <option value="">— Select —</option>
+          <option>Bachelors</option><option>Masters</option><option>Doctorate</option><option>Other</option>
+        </select>
+        <input type="text" id="sv-degree-other" class="sv-input" placeholder="Please specify" style="display:none;margin-top:8px;">
+      </div>
+
+      <!-- Q5 Years experience -->
+      <div class="sv-q">
+        <label class="sv-label">5. How many years of experience in optometry?</label>
+        <select id="sv-experience" class="sv-input">
+          <option value="">— Select —</option>
+          <option>1–3</option><option>4–6</option><option>7–9</option>
+          <option>10–12</option><option>13–15</option><option>16+</option>
+        </select>
+      </div>
+
+      <!-- Q6 Glaucoma expertise (multi-select) -->
+      <div class="sv-q">
+        <label class="sv-label">6. What qualifies your glaucoma expertise? <span style="font-weight:400;color:var(--text-dim);">(select one or more, as per your judgement)</span></label>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Glaucoma Clinical Experience (≥3 years)"> Glaucoma Clinical Experience (≥3 years)</label>
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Glaucoma Research Experience (≥3 years)"> Glaucoma Research Experience (≥3 years)</label>
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Specialised Postgraduate Training (via accredited organisation)"> Specialised Postgraduate Training (via accredited organisation)</label>
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Advanced Practitioner Status (via accredited course)"> Advanced Practitioner Status (via accredited course)</label>
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Committee Roles supporting Glaucoma Guideline Creation"> Committee Roles supporting Glaucoma Guideline Creation</label>
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Other" onchange="document.getElementById('sv-exp-other').style.display = this.checked ? 'block' : 'none';"> Other</label>
+          <input type="text" id="sv-exp-other" class="sv-input" placeholder="Please specify" style="display:none;">
+        </div>
+      </div>
     </div>
     <div class="survey-modal-footer">
-      <div class="survey-footer-note">Once you have submitted the survey, click the button to proceed to the study. Your survey responses are separate from your grading data.</div>
-      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
-        <button class="btn-survey-done" onclick="dismissSurvey()">I Have Completed the Survey Now &rarr;</button>
-        <button class="btn-survey-done" style="background:var(--surface2);border:1px solid var(--accent-mid);color:var(--accent);" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='var(--surface2)'" onclick="dismissSurvey()">I Have Previously Completed the Survey &rarr;</button>
-      </div>
+      <div class="survey-footer-note" id="sv-footer-note">Your survey responses are separate from your grading data and stored securely.</div>
+      <button class="btn-survey-done" onclick="submitSurvey()">Submit &amp; Begin Study &rarr;</button>
     </div>
   </div>
 </div>
@@ -524,8 +578,8 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
 
 <script>
 // ── SUPABASE CONFIG ────────────────────────────────────────
-const SUPABASE_URL = 'https://sxvwlyqsyenpflobgbpl.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4dndseXFzeWVucGZsb2JnYnBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTQyOTYsImV4cCI6MjA5MTYzMDI5Nn0.34V1EsA815PNlj49w4r9GTfMLjOMhzmXUQ1Fii9Dkn0';
+const SUPABASE_URL = 'https://kgmevtylenpuypqojkds.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnbWV2dHlsZW5wdXlwcW9qa2RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0NjA4MDgsImV4cCI6MjA5NjAzNjgwOH0.izMlNdjRcPmukJWqowc_xoi-Q575mAxN4htwvzY4ALw';
 const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let supabaseSession = null;
 
@@ -561,12 +615,17 @@ window.addEventListener('load', async function(){
 
 // ── IMAGE BASE URL ─────────────────────────────────────────
 const STORAGE_URL = SUPABASE_URL + '/storage/v1';
-const IMAGE_BUCKET = 'images';
-const IMAGE_AI_BUCKET = 'images_ai';
+// One bucket per reading session
+const SESSION_BUCKET = {
+  A: 'images_40_OCT',   // 40 cases,  Traditional OCT
+  B: 'images_40_ai',    // 40 cases,  AI-based OCT
+  C: 'images_480_OCT',  // 480 cases, Traditional OCT
+  D: 'images_480_ai'    // 480 cases, AI-based OCT
+};
 // Supports both .pdf and .jpg files
 
-// Signed URL cache — populated on login
-var signedUrls = { standard: {}, ai: {} };
+// Signed URL cache — populated on login, keyed by session
+var signedUrls = { A: {}, B: {}, C: {}, D: {} };
 
 // ── SESSION DEFINITIONS ────────────────────────────────────
 function buildCases(prefix, count){
@@ -587,10 +646,10 @@ function buildCases(prefix, count){
 }
 
 const SESSIONS = {
-  A: buildCases('CASE_A', 40),   // Traditional OCT → images bucket
-  B: buildCases('CASE_B', 40),   // AI-based OCT    → images_ai bucket
-  C: buildCases('CASE_C', 480),  // Traditional OCT → images bucket
-  D: buildCases('CASE_D', 480)   // AI-based OCT    → images_ai bucket
+  A: buildCases('CASE_A', 40),   // Traditional OCT → images_40_OCT
+  B: buildCases('CASE_B', 40),   // AI-based OCT    → images_40_ai
+  C: buildCases('CASE_C', 480),  // Traditional OCT → images_480_OCT
+  D: buildCases('CASE_D', 480)   // AI-based OCT    → images_480_ai
 };
 
 const SESSION_TOTALS = { A:40, B:40, C:480, D:480 };
@@ -859,6 +918,7 @@ async function doSignin(){
     if(!responses[currentSession][sCases[i].id]){ startIdx=i; break; }
   }
   loadCase(startIdx);
+  document.getElementById('sv-reader-id').value = readerId;
   document.getElementById('survey-modal').classList.add('active');
 }
 
@@ -947,80 +1007,112 @@ async function fetchAllSignedUrls(){
   showToast('Loading images...');
   var token = supabaseSession ? supabaseSession.access_token : SUPABASE_ANON_KEY;
 
-  // Collect all unique filenames across all sessions
-  var allFiles = {};
-  Object.values(SESSIONS).forEach(function(cases){
-    cases.forEach(function(c){ allFiles[c.filename] = true; });
-  });
-  var filenames = Object.keys(allFiles);
+  // Request signed URLs for each session from its own bucket
+  var sessionKeys = Object.keys(SESSIONS);
+  for(var s = 0; s < sessionKeys.length; s++){
+    var sess = sessionKeys[s];
+    var bucket = SESSION_BUCKET[sess];
 
-  // Batch request signed URLs for standard images
-  try {
-    var stdResp = await fetch(STORAGE_URL + '/object/sign/' + IMAGE_BUCKET, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + token,
-        'x-client-info': 'argus-stage1'
-      },
-      body: JSON.stringify({
-        paths: filenames,
-        expiresIn: 43200
-      })
-    });
-    var stdData = await stdResp.json();
-    if(Array.isArray(stdData)){
-      stdData.forEach(function(item){
-        if(item.signedURL){
-          signedUrls.standard[item.path] = SUPABASE_URL + '/storage/v1' + item.signedURL;
-        }
+    // Unique filenames for this session
+    var fileMap = {};
+    SESSIONS[sess].forEach(function(c){ fileMap[c.filename] = true; });
+    var sessFiles = Object.keys(fileMap);
+
+    try {
+      var resp = await fetch(STORAGE_URL + '/object/sign/' + bucket, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + token,
+          'x-client-info': 'argus-stage0'
+        },
+        body: JSON.stringify({
+          paths: sessFiles,
+          expiresIn: 43200
+        })
       });
-    }
-  } catch(e){ console.warn('Standard image URL fetch failed:', e); }
+      var data = await resp.json();
+      if(Array.isArray(data)){
+        data.forEach(function(item){
+          if(item.signedURL){
+            signedUrls[sess][item.path] = SUPABASE_URL + '/storage/v1' + item.signedURL;
+          }
+        });
+      }
+    } catch(e){ console.warn('Image URL fetch failed for session ' + sess + ':', e); }
+  }
 
-  // Batch request signed URLs for AI images
-  try {
-    var aiResp = await fetch(STORAGE_URL + '/object/sign/' + IMAGE_AI_BUCKET, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + token,
-        'x-client-info': 'argus-stage1'
-      },
-      body: JSON.stringify({
-        paths: filenames,
-        expiresIn: 43200
-      })
-    });
-    var aiData = await aiResp.json();
-    if(Array.isArray(aiData)){
-      aiData.forEach(function(item){
-        if(item.signedURL){
-          signedUrls.ai[item.path] = SUPABASE_URL + '/storage/v1' + item.signedURL;
-        }
-      });
-    }
-  } catch(e){ console.warn('AI image URL fetch failed:', e); }
-
-  // Apply signed URLs per session — A/C use standard, B/D use AI
-  var sessionBuckets = { A: 'standard', B: 'ai', C: 'standard', D: 'ai' };
+  // Apply signed URLs — each case uses its own session's bucket
   Object.keys(SESSIONS).forEach(function(sess){
-    var bucket = sessionBuckets[sess];
     SESSIONS[sess].forEach(function(c){
-      c.imageUrl = signedUrls[bucket][c.filename] || '';
+      c.imageUrl = signedUrls[sess][c.filename] || '';
     });
   });
 
   showToast('✓ Images ready');
 }
 
-function dismissSurvey(){
+async function submitSurvey(){
+  var note = document.getElementById('sv-footer-note');
+
+  // Q1 required
+  if(!readerId){
+    note.textContent = 'Reader ID missing — please log in again.';
+    note.style.color = 'var(--warn)';
+    return;
+  }
+
+  // Gather expertise checkboxes
+  var expertise = [];
+  document.querySelectorAll('.sv-exp:checked').forEach(function(cb){ expertise.push(cb.value); });
+  var expOther = document.getElementById('sv-exp-other').value.trim();
+  if(expOther) expertise.push('Other: ' + expOther);
+
+  var degree = document.getElementById('sv-degree').value;
+  var degreeOther = document.getElementById('sv-degree-other').value.trim();
+  if(degree === 'Other' && degreeOther) degree = 'Other: ' + degreeOther;
+
+  var payload = {
+    reader_id:        readerId,
+    user_id:          supabaseSession ? supabaseSession.user.id : null,
+    age_band:         document.getElementById('sv-age').value || null,
+    gender:           document.getElementById('sv-gender').value || null,
+    highest_degree:   degree || null,
+    years_experience: document.getElementById('sv-experience').value || null,
+    glaucoma_expertise: expertise.length ? expertise.join('; ') : null,
+    timestamp_submitted: ts()
+  };
+
+  // Save to Supabase
+  try {
+    var resp = await fetch(SUPABASE_URL + '/rest/v1/survey_responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + (supabaseSession ? supabaseSession.access_token : SUPABASE_ANON_KEY),
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+    if(!resp.ok){
+      var errText = await resp.text();
+      console.warn('Survey save failed:', errText);
+      note.textContent = 'Could not save survey. Please try again.';
+      note.style.color = 'var(--warn)';
+      return;
+    }
+  } catch(e){
+    console.warn('Survey save error:', e);
+    note.textContent = 'Network error saving survey. Please try again.';
+    note.style.color = 'var(--warn)';
+    return;
+  }
+
   document.getElementById('survey-modal').classList.remove('active');
-  showToast('Welcome back, ' + readerId);
+  showToast('Survey saved — welcome, ' + readerId);
 }
 
 // ── SESSIONS ───────────────────────────────────────────────
