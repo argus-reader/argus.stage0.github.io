@@ -216,8 +216,8 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
       <p style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center;margin-bottom:4px;">A Video Guide to the Reader Platform</p>
       <p style="font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:10px;">Please review this video prior to any reader sessions.</p>
-      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid var(--border);">
-        <iframe src="https://www.youtube.com/embed/h3YhF-XVGbQ?modestbranding=1&rel=0&color=white&vq=hd1080"
+      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid var(--border);min-width:100%;">
+        <iframe src="https://www.youtube.com/embed/h3YhF-XVGbQ?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1"
           style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
@@ -235,8 +235,8 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
       <p style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center;margin-bottom:4px;">A Video Guide to the Reader Platform</p>
       <p style="font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:10px;">Please review this video prior to any reader sessions.</p>
-      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid var(--border);">
-        <iframe src="https://www.youtube.com/embed/h3YhF-XVGbQ?modestbranding=1&rel=0&color=white&vq=hd1080"
+      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid var(--border);min-width:100%;">
+        <iframe src="https://www.youtube.com/embed/h3YhF-XVGbQ?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1"
           style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
@@ -1080,10 +1080,23 @@ function loadCase(idx){
     document.getElementById('manual-score').value = sv;
     updateSlider(sv, true);
   } else {
+    // Reset all three questions
     sliderTouched = false;
-  sliderTouched2 = false;
-  vfTestAnswer = null;
-    document.getElementById('risk-slider').value = 50;
+    sliderTouched2 = false;
+    vfTestAnswer = null;
+
+    // Q1 — Structural damage
+    document.getElementById('risk-slider-struct').value = 55;
+    document.getElementById('manual-score-struct').value = '';
+    document.getElementById('lh-display-struct').textContent = '—';
+    document.getElementById('lh-display-struct').style.color = 'var(--text-dim)';
+    document.getElementById('lh-pct-struct').style.visibility = 'hidden';
+    document.getElementById('lh-label-struct').style.visibility = 'hidden';
+    document.getElementById('slider-fill-struct').style.width = '50%';
+    document.getElementById('slider-fill-struct').style.background = 'var(--border-bright)';
+
+    // Q2 — Visual field defect
+    document.getElementById('risk-slider').value = 55;
     document.getElementById('manual-score').value = '';
     document.getElementById('lh-display').textContent = '—';
     document.getElementById('lh-display').style.color = 'var(--text-dim)';
@@ -1091,6 +1104,14 @@ function loadCase(idx){
     document.getElementById('lh-label').style.visibility = 'hidden';
     document.getElementById('slider-fill').style.width = '50%';
     document.getElementById('slider-fill').style.background = 'var(--border-bright)';
+
+    // Q3 — VF test buttons
+    document.getElementById('btn-vf-yes').style.background = 'transparent';
+    document.getElementById('btn-vf-yes').style.color = 'var(--text-muted)';
+    document.getElementById('btn-vf-no').style.background = 'transparent';
+    document.getElementById('btn-vf-no').style.color = 'var(--text-muted)';
+    document.getElementById('vf-hint').textContent = 'Please select Yes or No';
+    document.getElementById('vf-hint').style.color = 'var(--text-dim)';
   }
   setRespStatus(!!saved);
   var btn = document.getElementById('btn-submit');
