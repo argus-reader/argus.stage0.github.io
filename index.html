@@ -630,7 +630,7 @@ function buildCases(prefix, count){
   var arr = [];
   for(var i=1;i<=count;i++){
     var num = String(i).padStart(3,'0');
-    var imgNum = String(Math.min(i,20)).padStart(3,'0'); // placeholder: 20 cases
+    var imgNum = String(i).padStart(3,'0'); // real case numbers — 40/40/480/480
     var filename = 'CASE_'+imgNum+'.pdf';
     arr.push({
       id: prefix+'_'+num,
