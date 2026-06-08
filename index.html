@@ -53,6 +53,10 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .session-tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--accent);}
 .session-tab .tab-progress{font-size:9px;color:var(--text-dim);display:block;margin-top:2px;}
 .session-tab.active .tab-progress{color:var(--accent-mid);}
+.session-tab.locked{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.session-tab.locked .tab-progress{color:var(--text-dim);}
+.session-tab .tab-lock{font-size:9px;display:none;}
+.session-tab.locked .tab-lock{display:inline;}
 .reader-tab{background:var(--surface2);border-left:1px solid var(--border);padding:10px 14px;font-size:10px;color:var(--text-muted);display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;}
 .reader-tab strong{color:var(--accent);}
 
@@ -313,19 +317,19 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
     <div class="session-tabs" style="flex:1;">
       <button class="session-tab active" id="tab-a" onclick="switchSession('A')">
         Session A
-        <span class="tab-progress" id="tab-prog-a">0/40</span>
+        <span class="tab-lock" id="tab-lock-a">🔒 </span><span class="tab-progress" id="tab-prog-a">0/40</span>
       </button>
       <button class="session-tab" id="tab-b" onclick="switchSession('B')">
         Session B
-        <span class="tab-progress" id="tab-prog-b">0/40</span>
+        <span class="tab-lock" id="tab-lock-b">🔒 </span><span class="tab-progress" id="tab-prog-b">0/40</span>
       </button>
       <button class="session-tab" id="tab-c" onclick="switchSession('C')">
         Session C
-        <span class="tab-progress" id="tab-prog-c">0/480</span>
+        <span class="tab-lock" id="tab-lock-c">🔒 </span><span class="tab-progress" id="tab-prog-c">0/480</span>
       </button>
       <button class="session-tab" id="tab-d" onclick="switchSession('D')">
         Session D
-        <span class="tab-progress" id="tab-prog-d">0/480</span>
+        <span class="tab-lock" id="tab-lock-d">🔒 </span><span class="tab-progress" id="tab-prog-d">0/480</span>
       </button>
     </div>
     <div class="reader-tab">Reader: <strong id="header-reader-id">--</strong></div>
@@ -382,7 +386,6 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         <div class="slider-ticks" id="slider-ticks-struct"></div>
         <div class="slider-scale">
           <span>0 — Definitely absent</span>
-          <span>45 / 55</span>
           <span>100 — Definite</span>
         </div>
         <div class="manual-input-row">
@@ -411,7 +414,6 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         <div class="slider-ticks" id="slider-ticks"></div>
         <div class="slider-scale">
           <span>0 — Definitely absent</span>
-          <span>45 / 55</span>
           <span>100 — Definite</span>
         </div>
         <div class="manual-input-row">
@@ -652,6 +654,14 @@ const SESSION_TOTALS = { A:40, B:40, C:480, D:480 };
 
 // ── STATE ──────────────────────────────────────────────────
 let currentSession = 'A';
+// Crossover arm allocation (block size 2, seeded in Stata) — keyed to ARGUS ID
+const CROSSOVER_ALLOCATION = {
+  'ARGUS001':'D_first','ARGUS002':'C_first','ARGUS003':'D_first','ARGUS004':'C_first',
+  'ARGUS005':'C_first','ARGUS006':'D_first','ARGUS007':'D_first','ARGUS008':'C_first',
+  'ARGUS009':'D_first','ARGUS010':'C_first','ARGUS011':'C_first','ARGUS012':'D_first',
+  'ARGUS013':'D_first','ARGUS014':'C_first'
+};
+let crossoverArm = null;  // set on login from reader_registry
 let CASES = SESSIONS['A'];
 let currentIndex = 0;
 let readerId = '';
@@ -823,7 +833,8 @@ async function doSignup(){
     err.style.display='block'; return;
   }
 
-  // Record in reader registry
+  // Record in reader registry (with crossover arm assigned by ARGUS ID)
+  var assignedArm = CROSSOVER_ALLOCATION[autoRid] || null;
   try {
     await fetch(SUPABASE_URL + '/rest/v1/reader_registry', {
       method: 'POST',
@@ -833,7 +844,7 @@ async function doSignup(){
         'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
         'Prefer':        'return=minimal'
       },
-      body: JSON.stringify({ reader_id: autoRid, email: email })
+      body: JSON.stringify({ reader_id: autoRid, email: email, crossover_arm: assignedArm })
     });
   } catch(e){ console.warn('Registry insert failed:', e); }
 
@@ -871,7 +882,7 @@ async function doSignin(){
 
   // Verify email matches Reader ID in registry
   try {
-    var verifyResp = await fetch(SUPABASE_URL + '/rest/v1/reader_registry?reader_id=eq.' + encodeURIComponent(rid) + '&select=email', {
+    var verifyResp = await fetch(SUPABASE_URL + '/rest/v1/reader_registry?reader_id=eq.' + encodeURIComponent(rid) + '&select=email,crossover_arm', {
       headers: { 'apikey': SUPABASE_ANON_KEY }
     });
     var verifyData = await verifyResp.json();
@@ -887,6 +898,7 @@ async function doSignin(){
       btn.textContent = 'Begin Study →'; btn.disabled = false;
       return;
     }
+    crossoverArm = verifyData[0].crossover_arm || null;
   } catch(e){ console.warn('Verify:', e); }
 
   // Use email typed by reader directly
@@ -1130,6 +1142,10 @@ async function submitSurvey(){
 
 // ── SESSIONS ───────────────────────────────────────────────
 function switchSession(sess, skipLoad){
+  if(!skipLoad && !isSessionUnlocked(sess)){
+    showToast('Complete the previous session to unlock this one');
+    return;
+  }
   currentSession = sess;
   CASES = SESSIONS[sess];
   document.querySelectorAll('.session-tab').forEach(function(t){ t.classList.remove('active'); });
@@ -1147,11 +1163,37 @@ function switchSession(sess, skipLoad){
   updateTabProgress();
 }
 
+function isSessionUnlocked(sess){
+  var doneA = Object.keys(responses['A']||{}).length;
+  var doneB = Object.keys(responses['B']||{}).length;
+  var doneC = Object.keys(responses['C']||{}).length;
+  var doneD = Object.keys(responses['D']||{}).length;
+  var fullA = SESSION_TOTALS['A'], fullB = SESSION_TOTALS['B'];
+  var fullC = SESSION_TOTALS['C'], fullD = SESSION_TOTALS['D'];
+
+  if(sess === 'A') return true;                       // always open
+  if(sess === 'B') return doneA >= fullA;             // B after A complete
+  // After B complete, arm decides which of C/D opens first
+  if(doneB < fullB) return false;                     // C and D locked until B done
+  if(sess === 'C'){
+    if(crossoverArm === 'C_first') return true;       // C first for this arm
+    return doneD >= fullD;                            // otherwise C after D complete
+  }
+  if(sess === 'D'){
+    if(crossoverArm === 'D_first') return true;       // D first for this arm
+    return doneC >= fullC;                            // otherwise D after C complete
+  }
+  return false;
+}
+
 function updateTabProgress(){
   ['A','B','C','D'].forEach(function(s){
     var total = SESSION_TOTALS[s];
-    var done = Object.keys(responses[s]).length;
+    var done = Object.keys(responses[s]||{}).length;
     document.getElementById('tab-prog-'+s.toLowerCase()).textContent = done+'/'+total;
+    var tab = document.getElementById('tab-'+s.toLowerCase());
+    if(isSessionUnlocked(s)){ tab.classList.remove('locked'); }
+    else { tab.classList.add('locked'); }
   });
 }
 
