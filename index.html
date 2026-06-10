@@ -653,14 +653,17 @@ const SESSION_TOTALS = { A:40, B:40, C:480, D:480 };
 
 // ── STATE ──────────────────────────────────────────────────
 let currentSession = 'A';
-// Crossover arm allocation (block size 2, seeded in Stata) — keyed to ARGUS ID
+// Crossover arm allocation — fallback if Supabase fetch fails
+// Primary source: rando_arm table in Supabase
 const CROSSOVER_ALLOCATION = {
   'ARGUS001':'D_first','ARGUS002':'C_first','ARGUS003':'D_first','ARGUS004':'C_first',
   'ARGUS005':'C_first','ARGUS006':'D_first','ARGUS007':'D_first','ARGUS008':'C_first',
   'ARGUS009':'D_first','ARGUS010':'C_first','ARGUS011':'C_first','ARGUS012':'D_first',
   'ARGUS013':'D_first','ARGUS014':'C_first'
 };
-let crossoverArm = null;  // set on login from reader_registry
+let crossoverArm = null;  // set on login from rando_arm
+let caseOrderC = null;    // per-reader case order for session C (from rando_case_order)
+let caseOrderD = null;    // per-reader case order for session D (from rando_case_order)
 let CASES = SESSIONS['A'];
 let currentIndex = 0;
 let readerId = '';
@@ -916,7 +919,7 @@ async function doSignin(){
   document.getElementById('header-reader-id').textContent = readerId;
   showScreen('study-screen');
   showToast('Loading study...');
-  await Promise.all([fetchAllSignedUrls(), restoreSession()]);
+  await Promise.all([fetchAllSignedUrls(), restoreSession(), fetchRandomisation()]);
   switchSession(currentSession, true);
   // Find first unscored case in restored session
   var startIdx = 0;
@@ -973,6 +976,69 @@ async function doForgotPassword(){
 
   succ.innerHTML = '✓ Password reset email sent. Please check your inbox and follow the link to reset your password.';
   succ.style.display='block';
+}
+
+async function fetchRandomisation(){
+  if(!readerId) return;
+  var token = supabaseSession ? supabaseSession.access_token : SUPABASE_ANON_KEY;
+  var headers = { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + token };
+
+  try {
+    // Fetch arm allocation from rando_arm
+    var armResp = await fetch(
+      SUPABASE_URL + '/rest/v1/rando_arm?reader_id=eq.' + encodeURIComponent(readerId) + '&select=crossover_arm',
+      { headers: headers }
+    );
+    var armData = await armResp.json();
+    if(Array.isArray(armData) && armData.length > 0){
+      crossoverArm = armData[0].crossover_arm;
+    }
+  } catch(e){ console.warn('Arm fetch failed:', e); }
+
+  try {
+    // Fetch case order for sessions C and D from rando_case_order
+    var caseResp = await fetch(
+      SUPABASE_URL + '/rest/v1/rando_case_order?reader_id=eq.' + encodeURIComponent(readerId) +
+      '&select=session,case_id,presentation_order&order=session,presentation_order',
+      { headers: headers }
+    );
+    var caseData = await caseResp.json();
+    if(Array.isArray(caseData) && caseData.length > 0){
+      // Separate C and D
+      var seqC = caseData.filter(function(r){ return r.session === 'C'; })
+                         .sort(function(a,b){ return a.presentation_order - b.presentation_order; })
+                         .map(function(r){ return r.case_id; });
+      var seqD = caseData.filter(function(r){ return r.session === 'D'; })
+                         .sort(function(a,b){ return a.presentation_order - b.presentation_order; })
+                         .map(function(r){ return r.case_id; });
+
+      // Reorder SESSIONS['C'] and SESSIONS['D'] to match the fetched sequence
+      if(seqC.length === SESSIONS['C'].length){
+        caseOrderC = seqC;
+        SESSIONS['C'] = seqC.map(function(cid, idx){
+          return {
+            id:         'CASE_C_' + String(idx+1).padStart(3,'0'),
+            filename:   cid + '.pdf',
+            imageUrl:   '',
+            aiImageUrl: '',
+            label:      ''
+          };
+        });
+      }
+      if(seqD.length === SESSIONS['D'].length){
+        caseOrderD = seqD;
+        SESSIONS['D'] = seqD.map(function(cid, idx){
+          return {
+            id:         'CASE_D_' + String(idx+1).padStart(3,'0'),
+            filename:   cid + '.pdf',
+            imageUrl:   '',
+            aiImageUrl: '',
+            label:      ''
+          };
+        });
+      }
+    }
+  } catch(e){ console.warn('Case order fetch failed:', e); }
 }
 
 async function restoreSession(){
