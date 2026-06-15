@@ -385,8 +385,8 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         </div>
         <div class="slider-ticks" id="slider-ticks-struct"></div>
         <div class="slider-scale">
-          <span>0 — Definitely absent</span>
-          <span>100 — Definite</span>
+          <span>0 — Definite absent</span>
+          <span>100 — Definite defect</span>
         </div>
         <div class="manual-input-row">
           <span class="manual-input-label">Manual entry:</span>
@@ -413,8 +413,8 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         </div>
         <div class="slider-ticks" id="slider-ticks"></div>
         <div class="slider-scale">
-          <span>0 — Definitely absent</span>
-          <span>100 — Definite</span>
+          <span>0 — Definite absent</span>
+          <span>100 — Definite defect</span>
         </div>
         <div class="manual-input-row">
           <span class="manual-input-label">Manual entry:</span>
@@ -1044,7 +1044,7 @@ async function fetchRandomisation(){
 async function restoreSession(){
   try {
     var token = supabaseSession ? supabaseSession.access_token : SUPABASE_ANON_KEY;
-    var resp = await fetch(SUPABASE_URL + '/rest/v1/responses?reader_id=eq.' + encodeURIComponent(readerId) + '&select=session,case_id,likelihood_score,timestamp_submitted', {
+    var resp = await fetch(SUPABASE_URL + '/rest/v1/responses?reader_id=eq.' + encodeURIComponent(readerId) + '&select=session,case_id,likelihood_score,structural_score,vf_test_ordered,timestamp_submitted', {
       headers: {
         'apikey':        SUPABASE_ANON_KEY,
         'Authorization': 'Bearer ' + token
@@ -1067,9 +1067,11 @@ async function restoreSession(){
       var sess = row.session;
       if(!responses[sess]) return;
       responses[sess][row.case_id] = {
-        score:     parseInt(row.likelihood_score),
-        timestamp: row.timestamp_submitted,
-        restored:  true
+        score:            parseInt(row.likelihood_score),
+        structural_score: (row.structural_score !== null && row.structural_score !== undefined) ? parseInt(row.structural_score) : null,
+        vf_test_ordered:  (row.vf_test_ordered !== null && row.vf_test_ordered !== undefined) ? row.vf_test_ordered : null,
+        timestamp:        row.timestamp_submitted,
+        restored:         true
       };
       sessionCounts[sess]++;
       lastSession = sess;
@@ -1295,11 +1297,26 @@ function loadCase(idx){
   }
   var saved = responses[currentSession][c.id];
   if(saved){
+    // Q2 — Visual Field Defect
     sliderTouched = true;
     var sv = saved.score;
     document.getElementById('risk-slider').value = sv;
     document.getElementById('manual-score').value = sv;
     updateSlider(sv, true);
+
+    // Q1 — Structural Damage
+    if(saved.structural_score !== null && saved.structural_score !== undefined){
+      sliderTouched2 = true;
+      var ss = saved.structural_score;
+      document.getElementById('risk-slider-struct').value = ss;
+      document.getElementById('manual-score-struct').value = ss;
+      updateSlider2(ss, true);
+    }
+
+    // Q3 — Visual Field Test
+    if(saved.vf_test_ordered !== null && saved.vf_test_ordered !== undefined){
+      setVFTest(saved.vf_test_ordered);
+    }
   } else {
     // Reset all three questions
     sliderTouched = false;
@@ -1398,9 +1415,14 @@ function updateSlider(val, fromUser){
     document.getElementById('manual-score').value=val;
     document.getElementById('slider-fill').style.width=val+'%';
     var color,label;
-    if(val<=45){color='#4af09a';label=val===0?'Definitely absent':val<=10?'Very unlikely':'Low likelihood';}
-    else if(val<=69){color='#f0a44a';label=val===50?'Uncertain':val<50?'Leaning absent':'Leaning present';}
-    else{color='#f06060';label=val>=90?'Definite defect':'High likelihood';}
+    if(val===0){color='#4af09a';label='Definite absent';}
+    else if(val<=15){color='#4af09a';label='Very unlikely';}
+    else if(val<=40){color='#4af09a';label='Low likelihood';}
+    else if(val===45){color='#f0a44a';label='Leaning absent';}
+    else if(val===55){color='#f0a44a';label='Leaning present';}
+    else if(val<=80){color='#f06060';label='High likelihood';}
+    else if(val<=95){color='#f06060';label='Very likely';}
+    else{color='#f06060';label='Definite defect';}
     document.getElementById('slider-fill').style.background=color;
     document.getElementById('lh-display').style.color=color;
     document.getElementById('lh-label').textContent=label;
@@ -1479,9 +1501,14 @@ function updateSlider2(val, fromUser){
     document.getElementById('manual-score-struct').value=val;
     document.getElementById('slider-fill-struct').style.width=val+'%';
     var color,label;
-    if(val<=45){color='#4af09a';label=val===0?'Definitely absent':val<=10?'Very unlikely':'Low likelihood';}
-    else if(val<=69){color='#f0a44a';label=val<50?'Leaning absent':'Leaning present';}
-    else{color='#f06060';label=val>=90?'Definite defect':'High likelihood';}
+    if(val===0){color='#4af09a';label='Definite absent';}
+    else if(val<=15){color='#4af09a';label='Very unlikely';}
+    else if(val<=40){color='#4af09a';label='Low likelihood';}
+    else if(val===45){color='#f0a44a';label='Leaning absent';}
+    else if(val===55){color='#f0a44a';label='Leaning present';}
+    else if(val<=80){color='#f06060';label='High likelihood';}
+    else if(val<=95){color='#f06060';label='Very likely';}
+    else{color='#f06060';label='Definite defect';}
     document.getElementById('slider-fill-struct').style.background=color;
     document.getElementById('lh-display-struct').style.color=color;
     document.getElementById('lh-label-struct').textContent=label;
@@ -1606,7 +1633,15 @@ function confirmOverwrite(){
 }
 
 function commitGrade(caseId,score){
-  responses[currentSession][caseId]={ score:score, timestamp:ts(), caseStart:caseStartTime, sessionStart:sessionStartTime };
+  var scoreStruct = Math.round(parseInt(document.getElementById('risk-slider-struct').value)/5)*5;
+  responses[currentSession][caseId]={
+    score:           score,
+    structural_score: scoreStruct,
+    vf_test_ordered:  vfTestAnswer,
+    timestamp:       ts(),
+    caseStart:       caseStartTime,
+    sessionStart:    sessionStartTime
+  };
   submitToGoogleSheets(caseId, score);
   setRespStatus(true);
   var btn=document.getElementById('btn-submit');
