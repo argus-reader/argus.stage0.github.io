@@ -227,7 +227,7 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
       <p style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center;margin-bottom:4px;">A Video Guide to the Reader Platform</p>
       <p style="font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:10px;">Please review this video prior to any reader sessions.</p>
       <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid var(--border);width:100%;max-width:380px;margin:0 auto;">
-        <iframe src="https://www.youtube.com/embed/g-WMQ32F6kY?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1"
+        <iframe src="https://www.youtube.com/embed/uW-OZ--eUbk?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1"
           style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
@@ -246,7 +246,7 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
       <p style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center;margin-bottom:4px;">A Video Guide to the Reader Platform</p>
       <p style="font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:10px;">Please review this video prior to any reader sessions.</p>
       <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid var(--border);width:100%;max-width:380px;margin:0 auto;">
-        <iframe id="signin-video-iframe" data-src="https://www.youtube.com/embed/g-WMQ32F6kY?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1" src="https://www.youtube.com/embed/g-WMQ32F6kY?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1"
+        <iframe id="signin-video-iframe" data-src="https://www.youtube.com/embed/uW-OZ--eUbk?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1" src="https://www.youtube.com/embed/uW-OZ--eUbk?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1"
           style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen>
@@ -385,8 +385,8 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         </div>
         <div class="slider-ticks" id="slider-ticks-struct"></div>
         <div class="slider-scale">
-          <span>0 — Definite absent</span>
-          <span>100 — Definite defect</span>
+          <span>0</span>
+          <span>100</span>
         </div>
         <div class="manual-input-row">
           <span class="manual-input-label">Manual entry:</span>
@@ -413,8 +413,8 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         </div>
         <div class="slider-ticks" id="slider-ticks"></div>
         <div class="slider-scale">
-          <span>0 — Definite absent</span>
-          <span>100 — Definite defect</span>
+          <span>0</span>
+          <span>100</span>
         </div>
         <div class="manual-input-row">
           <span class="manual-input-label">Manual entry:</span>
@@ -426,8 +426,18 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
       <div style="border-top:1px solid var(--border);margin:12px 0;"></div>
 
       <!-- Q3: Visual Field Test -->
+      <div class="likelihood-section" id="hemifield-section" style="display:none;">
+        <div class="sec-label">3 — Which <span style="color:var(--accent);">hemifield</span> is impacted?</div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button id="btn-hemi-sup" onclick="setHemifield('superior')" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;">Superior</button>
+          <button id="btn-hemi-inf" onclick="setHemifield('inferior')" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;">Inferior</button>
+          <button id="btn-hemi-both" onclick="setHemifield('both')" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;">Both</button>
+        </div>
+        <div id="hemi-hint" style="font-size:10px;color:var(--text-dim);margin-top:6px;">Select superior, inferior, or both</div>
+      </div>
+
       <div class="likelihood-section">
-        <div class="sec-label">3 — Would you perform a <span style="color:var(--accent);">visual field test</span> for this eye as part of your work-up?</div>
+        <div class="sec-label" id="vftest-label">4 — Would you perform a <span style="color:var(--accent);">visual field test</span> for this eye as part of your work-up?</div>
         <div style="display:flex;gap:12px;margin-top:10px;">
           <button id="btn-vf-yes" onclick="setVFTest(true)" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;">Yes</button>
           <button id="btn-vf-no" onclick="setVFTest(false)" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;">No</button>
@@ -675,6 +685,7 @@ let sessionStartTime = null;
 let caseStartTime = null;
 let sliderTouched = false;
 let vfTestAnswer = null;
+let hemifieldAnswer = null;  // session A only
 
 function ts(){ return new Date().toLocaleString('en-AU', { timeZone: 'Australia/Melbourne', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false }); }
 
@@ -1044,7 +1055,7 @@ async function fetchRandomisation(){
 async function restoreSession(){
   try {
     var token = supabaseSession ? supabaseSession.access_token : SUPABASE_ANON_KEY;
-    var resp = await fetch(SUPABASE_URL + '/rest/v1/responses?reader_id=eq.' + encodeURIComponent(readerId) + '&select=session,case_id,likelihood_score,structural_score,vf_test_ordered,timestamp_submitted', {
+    var resp = await fetch(SUPABASE_URL + '/rest/v1/responses?reader_id=eq.' + encodeURIComponent(readerId) + '&select=session,case_id,likelihood_score,structural_score,vf_test_ordered,hemifield,timestamp_submitted', {
       headers: {
         'apikey':        SUPABASE_ANON_KEY,
         'Authorization': 'Bearer ' + token
@@ -1070,6 +1081,7 @@ async function restoreSession(){
         score:            parseInt(row.likelihood_score),
         structural_score: (row.structural_score !== null && row.structural_score !== undefined) ? parseInt(row.structural_score) : null,
         vf_test_ordered:  (row.vf_test_ordered !== null && row.vf_test_ordered !== undefined) ? row.vf_test_ordered : null,
+        hemifield:        (row.hemifield !== null && row.hemifield !== undefined) ? row.hemifield : null,
         timestamp:        row.timestamp_submitted,
         restored:         true
       };
@@ -1268,6 +1280,11 @@ function updateTabProgress(){
 function loadCase(idx){
   currentIndex = idx;
   caseStartTime = ts();
+  // Q3 hemifield is session A only; renumber the VF-test question accordingly
+  var isSessionA = (currentSession === 'A');
+  document.getElementById('hemifield-section').style.display = isSessionA ? 'block' : 'none';
+  document.getElementById('vftest-label').innerHTML = (isSessionA ? '4' : '3') +
+    ' — Would you perform a <span style="color:var(--accent);">visual field test</span> for this eye as part of your work-up?';
   sliderTouched = false;
   sliderTouched2 = false;
   vfTestAnswer = null;
@@ -1317,6 +1334,15 @@ function loadCase(idx){
     if(saved.vf_test_ordered !== null && saved.vf_test_ordered !== undefined){
       setVFTest(saved.vf_test_ordered);
     }
+
+    // Q3 hemifield (session A only)
+    if(currentSession === 'A'){
+      if(saved.hemifield !== null && saved.hemifield !== undefined && saved.hemifield !== ''){
+        setHemifield(saved.hemifield);
+      } else {
+        resetHemifield();
+      }
+    }
   } else {
     // Reset all three questions
     sliderTouched = false;
@@ -1350,6 +1376,9 @@ function loadCase(idx){
     document.getElementById('btn-vf-no').style.color = 'var(--text-muted)';
     document.getElementById('vf-hint').textContent = 'Please select Yes or No';
     document.getElementById('vf-hint').style.color = 'var(--text-dim)';
+
+    // Q3 (session A) — hemifield reset
+    resetHemifield();
   }
   setRespStatus(!!saved);
   var btn = document.getElementById('btn-submit');
@@ -1418,7 +1447,7 @@ function updateSlider(val, fromUser){
     if(val===0){color='#4af09a';label='Definite absent';}
     else if(val<=15){color='#4af09a';label='Very unlikely';}
     else if(val<=40){color='#4af09a';label='Low likelihood';}
-    else if(val===45){color='#f0a44a';label='Leaning absent';}
+    else if(val===45){color='#4af09a';label='Leaning absent';}
     else if(val===55){color='#f0a44a';label='Leaning present';}
     else if(val<=80){color='#f06060';label='High likelihood';}
     else if(val<=95){color='#f06060';label='Very likely';}
@@ -1504,7 +1533,7 @@ function updateSlider2(val, fromUser){
     if(val===0){color='#4af09a';label='Definite absent';}
     else if(val<=15){color='#4af09a';label='Very unlikely';}
     else if(val<=40){color='#4af09a';label='Low likelihood';}
-    else if(val===45){color='#f0a44a';label='Leaning absent';}
+    else if(val===45){color='#4af09a';label='Leaning absent';}
     else if(val===55){color='#f0a44a';label='Leaning present';}
     else if(val<=80){color='#f06060';label='High likelihood';}
     else if(val<=95){color='#f06060';label='Very likely';}
@@ -1576,6 +1605,32 @@ function setVFTest(val){
   }
 }
 
+function setHemifield(val){
+  hemifieldAnswer = val;
+  var map = { superior:'btn-hemi-sup', inferior:'btn-hemi-inf', both:'btn-hemi-both' };
+  ['btn-hemi-sup','btn-hemi-inf','btn-hemi-both'].forEach(function(id){
+    var b = document.getElementById(id);
+    b.style.background = 'transparent';
+    b.style.color = 'var(--text-muted)';
+  });
+  var sel = document.getElementById(map[val]);
+  sel.style.background = 'var(--accent)';
+  sel.style.color = '#000';
+  var hint = document.getElementById('hemi-hint');
+  hint.textContent = 'Hemifield: ' + val.charAt(0).toUpperCase() + val.slice(1);
+  hint.style.color = 'var(--accent)';
+}
+
+function resetHemifield(){
+  hemifieldAnswer = null;
+  ['btn-hemi-sup','btn-hemi-inf','btn-hemi-both'].forEach(function(id){
+    var b = document.getElementById(id);
+    if(b){ b.style.background='transparent'; b.style.color='var(--text-muted)'; }
+  });
+  var hint = document.getElementById('hemi-hint');
+  if(hint){ hint.textContent='Select superior, inferior, or both'; hint.style.color='var(--text-dim)'; }
+}
+
 // ── NAVIGATION ─────────────────────────────────────────────
 function navigate(dir){
   var ni=currentIndex+dir;
@@ -1610,8 +1665,15 @@ function attemptSubmit(){
     setTimeout(function(){ document.getElementById('login-error').style.display='none'; }, 3000);
     return;
   }
+  if(currentSession === 'A' && hemifieldAnswer === null){
+    document.getElementById('login-error').textContent = 'Please answer Question 3 (Hemifield) before submitting.';
+    document.getElementById('login-error').style.display = 'block';
+    setTimeout(function(){ document.getElementById('login-error').style.display='none'; }, 3000);
+    return;
+  }
   if(vfTestAnswer === null){
-    document.getElementById('login-error').textContent = 'Please answer Question 3 (Visual Field Test) before submitting.';
+    var qNum = (currentSession === 'A') ? '4' : '3';
+    document.getElementById('login-error').textContent = 'Please answer Question ' + qNum + ' (Visual Field Test) before submitting.';
     document.getElementById('login-error').style.display = 'block';
     setTimeout(function(){ document.getElementById('login-error').style.display='none'; }, 3000);
     return;
@@ -1638,6 +1700,7 @@ function commitGrade(caseId,score){
     score:           score,
     structural_score: scoreStruct,
     vf_test_ordered:  vfTestAnswer,
+    hemifield:       (currentSession === 'A') ? hemifieldAnswer : null,
     timestamp:       ts(),
     caseStart:       caseStartTime,
     sessionStart:    sessionStartTime
@@ -1665,6 +1728,7 @@ async function submitToGoogleSheets(caseId, score){
     structural_score:        scoreStruct,
     likelihood_score:        score,
     vf_test_ordered:         vfTestAnswer,
+    hemifield:               (currentSession === 'A') ? hemifieldAnswer : null,
     timestamp_submitted:     ts(),
     timestamp_case_start:    caseStartTime,
     timestamp_session_start: sessionStartTime
