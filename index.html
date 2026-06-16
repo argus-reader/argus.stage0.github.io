@@ -201,6 +201,7 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
 .sv-input:focus{outline:none;border-color:var(--accent);}
 .sv-check{display:flex;align-items:flex-start;gap:8px;font-family:var(--mono);font-size:12px;color:var(--text-muted);line-height:1.5;cursor:pointer;}
 .sv-check input{margin-top:2px;flex-shrink:0;accent-color:var(--accent);}
+.sv-range{flex:1;accent-color:var(--accent);cursor:pointer;}
 </style>
 </head>
 <body>
@@ -508,14 +509,13 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         </select>
       </div>
 
-      <!-- Q4 FTE years in clinical practice -->
+      <!-- Q4 FTE years in clinical practice (slider) -->
       <div class="sv-q">
         <label class="sv-label">4. How many full-time equivalent years have you been in optometry clinical practice?</label>
-        <select id="sv-experience" class="sv-input">
-          <option value="">— Select —</option>
-          <option>1–3</option><option>4–6</option><option>7–9</option>
-          <option>10–12</option><option>13–15</option><option>16+</option>
-        </select>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+          <input type="range" id="sv-experience" class="sv-range" min="0" max="20" step="1" value="0" oninput="document.getElementById('sv-exp-val').textContent = (this.value>=20?'≥20':this.value) + (this.value==1?' year':' years');">
+          <span id="sv-exp-val" style="font-family:var(--mono);font-size:13px;color:var(--accent);min-width:64px;text-align:right;">0 years</span>
+        </div>
       </div>
 
       <!-- Q5 Year of professional qualification -->
@@ -529,7 +529,7 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         <label class="sv-label">6. Are you a therapeutically-endorsed optometrist?</label>
         <select id="sv-therapeutic" class="sv-input">
           <option value="">— Select —</option>
-          <option>Yes</option><option>No</option><option>Unsure</option>
+          <option>Yes</option><option>No</option>
         </select>
       </div>
 
@@ -539,8 +539,12 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
           <label class="sv-check"><input type="checkbox" class="sv-exp" value="Special interest in the management of glaucoma"> Special interest in the management of glaucoma</label>
           <label class="sv-check"><input type="checkbox" class="sv-exp" value="Currently work or previously worked in a specialised glaucoma clinic"> Currently work or previously worked in a specialised glaucoma clinic</label>
-          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Advanced glaucoma education / qualification (e.g., Australian College of Optometry Advanced Certificate in Glaucoma)"> Advanced glaucoma education / qualification (e.g., Australian College of Optometry Advanced Certificate in Glaucoma)</label>
-          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Advanced glaucoma credentials / recognitions (e.g., Optometry Australia Credentialled Advanced Practitioner – Glaucoma)"> Advanced glaucoma credentials / recognitions (e.g., Optometry Australia Credentialled Advanced Practitioner – Glaucoma)</label>
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Advanced glaucoma education / qualification"> Advanced glaucoma education / qualification&nbsp;<sup style="color:var(--accent);">1</sup></label>
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Advanced glaucoma credentials / recognitions"> Advanced glaucoma credentials / recognitions&nbsp;<sup style="color:var(--accent);">2</sup></label>
+        </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:9px;color:var(--text-dim);line-height:1.6;">
+          <div><sup style="color:var(--accent);">1</sup> e.g. Australian College of Optometry Advanced Certificate in Glaucoma</div>
+          <div><sup style="color:var(--accent);">2</sup> e.g. Optometry Australia Credentialled Advanced Practitioner – Glaucoma</div>
         </div>
       </div>
     </div>
@@ -1135,7 +1139,7 @@ async function submitSurvey(){
     user_id:          supabaseSession ? supabaseSession.user.id : null,
     age_band:         document.getElementById('sv-age').value || null,
     gender:           document.getElementById('sv-gender').value || null,
-    years_experience: document.getElementById('sv-experience').value || null,
+    years_experience: (function(){ var v = document.getElementById('sv-experience').value; return v === '20' ? '≥20' : v; })(),
     year_of_qualification: document.getElementById('sv-qual-year').value || null,
     therapeutic_endorsement: document.getElementById('sv-therapeutic').value || null,
     glaucoma_expertise: expertise.length ? expertise.join('; ') : null,
