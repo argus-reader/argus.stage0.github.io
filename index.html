@@ -223,17 +223,6 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
       <input class="field-input" type="email" id="reader-email" placeholder="e.g. yourname@gmail.com" autocomplete="off" style="margin-bottom:20px;">
       <p style="font-size:10px;color:var(--text-dim);margin-bottom:20px;">Your unique ARGUS ID will be provided upon registration. No password is required. Please make a note of your ARGUS ID, you will need it for the login page.</p>
       <button class="btn-primary" id="btn-signup" onclick="doSignup()">Register &rarr;</button>
-    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
-      <p style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center;margin-bottom:4px;">A Video Guide to the Reader Platform</p>
-      <p style="font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:10px;">Please review this video prior to any reader sessions.</p>
-      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid var(--border);width:100%;max-width:380px;margin:0 auto;">
-        <iframe src="https://www.youtube.com/embed/uW-OZ--eUbk?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1"
-          style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
-    </div>
     </div>
 
     <div id="signin-fields" style="display:none;">
@@ -242,17 +231,6 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
       <label class="field-label" for="signin-email">Email Address</label>
       <input class="field-input" type="email" id="signin-email" placeholder="and yourname@gmail.com" autocomplete="off" style="margin-bottom:20px;">
       <button class="btn-primary" id="btn-signin" onclick="doSignin()">Begin Study &rarr;</button>
-    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
-      <p style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center;margin-bottom:4px;">A Video Guide to the Reader Platform</p>
-      <p style="font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:10px;">Please review this video prior to any reader sessions.</p>
-      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border:1px solid var(--border);width:100%;max-width:380px;margin:0 auto;">
-        <iframe id="signin-video-iframe" data-src="https://www.youtube.com/embed/uW-OZ--eUbk?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1" src="https://www.youtube.com/embed/uW-OZ--eUbk?modestbranding=1&rel=0&color=white&vq=hd1080&hd=1"
-          style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
-    </div>
       <div style="text-align:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
         <div style="font-size:10px;color:var(--text-dim);">Having trouble? Please contact <a href="mailto:yscantling-birch&#64;cera.org.au" style="color:var(--accent);text-decoration:none;">Dr Y Scantling-Birch</a> if issues with access.</div>
       </div>
@@ -371,7 +349,7 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
 
       <!-- Q1: Structural Damage -->
       <div class="likelihood-section">
-        <div class="sec-label">1 — Likelihood of Glaucomatous <span style="color:var(--accent);">Structural Damage</span></div>
+        <div class="sec-label" id="q1-label">1 — Likelihood of Glaucomatous <span style="color:var(--accent);">Structural Damage</span></div>
         <div class="lh-value-row">
           <div class="lh-number" id="lh-display-struct" style="color:var(--text-dim);">—</div>
           <div class="lh-pct" id="lh-pct-struct" style="visibility:hidden;">%</div>
@@ -395,11 +373,10 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         </div>
       </div>
 
-      <div style="border-top:1px solid var(--border);margin:12px 0;"></div>
-
+      <div style="border-top:1px solid var(--border);margin:6px 0;"></div>
       <!-- Q2: Visual Field Defect -->
       <div class="likelihood-section">
-        <div class="sec-label">2 — Likelihood of Glaucomatous <span style="color:var(--accent);">Visual Field Defect</span></div>
+        <div class="sec-label" id="q2-label">2 — Likelihood of Glaucomatous <span style="color:var(--accent);">Visual Field Defect</span></div>
         <div class="lh-value-row">
           <div class="lh-number" id="lh-display" style="color:var(--text-dim);">—</div>
           <div class="lh-pct" id="lh-pct" style="visibility:hidden;">%</div>
@@ -423,21 +400,11 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         </div>
       </div>
 
-      <div style="border-top:1px solid var(--border);margin:12px 0;"></div>
+      <div style="border-top:1px solid var(--border);margin:6px 0;"></div>
 
       <!-- Q3: Visual Field Test -->
-      <div class="likelihood-section" id="hemifield-section" style="display:none;">
-        <div class="sec-label">3 — Which <span style="color:var(--accent);">hemifield</span> is impacted?</div>
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button id="btn-hemi-sup" onclick="setHemifield('superior')" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;">Superior</button>
-          <button id="btn-hemi-inf" onclick="setHemifield('inferior')" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;">Inferior</button>
-          <button id="btn-hemi-both" onclick="setHemifield('both')" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;">Both</button>
-        </div>
-        <div id="hemi-hint" style="font-size:10px;color:var(--text-dim);margin-top:6px;">Select superior, inferior, or both</div>
-      </div>
-
       <div class="likelihood-section">
-        <div class="sec-label" id="vftest-label">4 — Would you perform a <span style="color:var(--accent);">visual field test</span> for this eye as part of your work-up?</div>
+        <div class="sec-label" id="vftest-label">3 — Do you think <span style="color:var(--accent);">visual field testing</span> is indicated for this eye?</div>
         <div style="display:flex;gap:12px;margin-top:10px;">
           <button id="btn-vf-yes" onclick="setVFTest(true)" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;">Yes</button>
           <button id="btn-vf-no" onclick="setVFTest(false)" style="flex:1;padding:10px;background:transparent;border:1px solid var(--border-bright);color:var(--text-muted);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;">No</button>
@@ -541,19 +508,9 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         </select>
       </div>
 
-      <!-- Q4 Highest degree -->
+      <!-- Q4 FTE years in clinical practice -->
       <div class="sv-q">
-        <label class="sv-label">4. What is your highest degree?</label>
-        <select id="sv-degree" class="sv-input" onchange="document.getElementById('sv-degree-other').style.display = this.value==='Other' ? 'block' : 'none';">
-          <option value="">— Select —</option>
-          <option>Bachelors</option><option>Masters</option><option>Doctorate</option><option>Other</option>
-        </select>
-        <input type="text" id="sv-degree-other" class="sv-input" placeholder="Please specify" style="display:none;margin-top:8px;">
-      </div>
-
-      <!-- Q5 Years experience -->
-      <div class="sv-q">
-        <label class="sv-label">5. How many years of experience in optometry?</label>
+        <label class="sv-label">4. How many full-time equivalent years have you been in optometry clinical practice?</label>
         <select id="sv-experience" class="sv-input">
           <option value="">— Select —</option>
           <option>1–3</option><option>4–6</option><option>7–9</option>
@@ -561,17 +518,29 @@ input[type=range].risk-slider::-moz-range-thumb{width:18px;height:18px;backgroun
         </select>
       </div>
 
-      <!-- Q6 Glaucoma expertise (multi-select) -->
+      <!-- Q5 Year of professional qualification -->
       <div class="sv-q">
-        <label class="sv-label">6. What qualifies your glaucoma expertise? <span style="font-weight:400;color:var(--text-dim);">(select one or more, as per your judgement)</span></label>
+        <label class="sv-label">5. What is your year of professional qualification?</label>
+        <input type="number" id="sv-qual-year" class="sv-input" min="1950" max="2026" placeholder="e.g. 2015">
+      </div>
+
+      <!-- Q6 Therapeutic endorsement -->
+      <div class="sv-q">
+        <label class="sv-label">6. Are you a therapeutically-endorsed optometrist?</label>
+        <select id="sv-therapeutic" class="sv-input">
+          <option value="">— Select —</option>
+          <option>Yes</option><option>No</option><option>Unsure</option>
+        </select>
+      </div>
+
+      <!-- Q7 Glaucoma experience (multi-select) -->
+      <div class="sv-q">
+        <label class="sv-label">7. What describes your glaucoma experience? <span style="font-weight:400;color:var(--text-dim);">(select one or more, as per your judgement)</span></label>
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
-          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Glaucoma Clinical Experience (≥3 years)"> Glaucoma Clinical Experience (≥3 years)</label>
-          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Glaucoma Research Experience (≥3 years)"> Glaucoma Research Experience (≥3 years)</label>
-          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Specialised Postgraduate Training (via accredited organisation)"> Specialised Postgraduate Training (via accredited organisation)</label>
-          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Advanced Practitioner Status (via accredited course)"> Advanced Practitioner Status (via accredited course)</label>
-          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Committee Roles supporting Glaucoma Guideline Creation"> Committee Roles supporting Glaucoma Guideline Creation</label>
-          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Other" onchange="document.getElementById('sv-exp-other').style.display = this.checked ? 'block' : 'none';"> Other</label>
-          <input type="text" id="sv-exp-other" class="sv-input" placeholder="Please specify" style="display:none;">
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Special interest in the management of glaucoma"> Special interest in the management of glaucoma</label>
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Currently work or previously worked in a specialised glaucoma clinic"> Currently work or previously worked in a specialised glaucoma clinic</label>
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Advanced glaucoma education / qualification (e.g., Australian College of Optometry Advanced Certificate in Glaucoma)"> Advanced glaucoma education / qualification (e.g., Australian College of Optometry Advanced Certificate in Glaucoma)</label>
+          <label class="sv-check"><input type="checkbox" class="sv-exp" value="Advanced glaucoma credentials / recognitions (e.g., Optometry Australia Credentialled Advanced Practitioner – Glaucoma)"> Advanced glaucoma credentials / recognitions (e.g., Optometry Australia Credentialled Advanced Practitioner – Glaucoma)</label>
         </div>
       </div>
     </div>
@@ -685,7 +654,6 @@ let sessionStartTime = null;
 let caseStartTime = null;
 let sliderTouched = false;
 let vfTestAnswer = null;
-let hemifieldAnswer = null;  // session A only
 
 function ts(){ return new Date().toLocaleString('en-AU', { timeZone: 'Australia/Melbourne', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false }); }
 
@@ -729,15 +697,6 @@ function setAuthMode(mode){
   document.getElementById('tab-signin').style.color = isSignin ? '#000' : 'var(--text-muted)';
   document.getElementById('login-error').style.display = 'none';
   document.getElementById('login-success').style.display = 'none';
-  // Reload signin video iframe once its container is visible so YouTube
-  // serves a full-resolution thumbnail (a display:none container loads a tiny one)
-  if(isSignin){
-    var vf = document.getElementById('signin-video-iframe');
-    if(vf && vf.getAttribute('data-src')){
-      // Force a reload on the now-visible, correctly-sized container
-      vf.src = vf.getAttribute('data-src');
-    }
-  }
 }
 
 async function doSignup(){
@@ -1055,7 +1014,7 @@ async function fetchRandomisation(){
 async function restoreSession(){
   try {
     var token = supabaseSession ? supabaseSession.access_token : SUPABASE_ANON_KEY;
-    var resp = await fetch(SUPABASE_URL + '/rest/v1/responses?reader_id=eq.' + encodeURIComponent(readerId) + '&select=session,case_id,likelihood_score,structural_score,vf_test_ordered,hemifield,timestamp_submitted', {
+    var resp = await fetch(SUPABASE_URL + '/rest/v1/responses?reader_id=eq.' + encodeURIComponent(readerId) + '&select=session,case_id,likelihood_score,structural_score,vf_test_ordered,timestamp_submitted', {
       headers: {
         'apikey':        SUPABASE_ANON_KEY,
         'Authorization': 'Bearer ' + token
@@ -1081,7 +1040,6 @@ async function restoreSession(){
         score:            parseInt(row.likelihood_score),
         structural_score: (row.structural_score !== null && row.structural_score !== undefined) ? parseInt(row.structural_score) : null,
         vf_test_ordered:  (row.vf_test_ordered !== null && row.vf_test_ordered !== undefined) ? row.vf_test_ordered : null,
-        hemifield:        (row.hemifield !== null && row.hemifield !== undefined) ? row.hemifield : null,
         timestamp:        row.timestamp_submitted,
         restored:         true
       };
@@ -1171,20 +1129,15 @@ async function submitSurvey(){
   // Gather expertise checkboxes
   var expertise = [];
   document.querySelectorAll('.sv-exp:checked').forEach(function(cb){ expertise.push(cb.value); });
-  var expOther = document.getElementById('sv-exp-other').value.trim();
-  if(expOther) expertise.push('Other: ' + expOther);
-
-  var degree = document.getElementById('sv-degree').value;
-  var degreeOther = document.getElementById('sv-degree-other').value.trim();
-  if(degree === 'Other' && degreeOther) degree = 'Other: ' + degreeOther;
 
   var payload = {
     reader_id:        readerId,
     user_id:          supabaseSession ? supabaseSession.user.id : null,
     age_band:         document.getElementById('sv-age').value || null,
     gender:           document.getElementById('sv-gender').value || null,
-    highest_degree:   degree || null,
     years_experience: document.getElementById('sv-experience').value || null,
+    year_of_qualification: document.getElementById('sv-qual-year').value || null,
+    therapeutic_endorsement: document.getElementById('sv-therapeutic').value || null,
     glaucoma_expertise: expertise.length ? expertise.join('; ') : null,
     timestamp_submitted: ts()
   };
@@ -1280,11 +1233,17 @@ function updateTabProgress(){
 function loadCase(idx){
   currentIndex = idx;
   caseStartTime = ts();
-  // Q3 hemifield is session A only; renumber the VF-test question accordingly
+  // Q1 and Q2 slider labels depend on session:
+  //   Session A → superior / inferior hemifield GVFD likelihood
+  //   Sessions B/C/D → structural damage / visual field defect likelihood
   var isSessionA = (currentSession === 'A');
-  document.getElementById('hemifield-section').style.display = isSessionA ? 'block' : 'none';
-  document.getElementById('vftest-label').innerHTML = (isSessionA ? '4' : '3') +
-    ' — Would you perform a <span style="color:var(--accent);">visual field test</span> for this eye as part of your work-up?';
+  if(isSessionA){
+    document.getElementById('q1-label').innerHTML = '1 — Likelihood of the <span style="color:var(--accent);">superior hemifield</span> having a glaucomatous visual field defect';
+    document.getElementById('q2-label').innerHTML = '2 — Likelihood of the <span style="color:var(--accent);">inferior hemifield</span> having a glaucomatous visual field defect';
+  } else {
+    document.getElementById('q1-label').innerHTML = '1 — Likelihood of Glaucomatous <span style="color:var(--accent);">Structural Damage</span>';
+    document.getElementById('q2-label').innerHTML = '2 — Likelihood of Glaucomatous <span style="color:var(--accent);">Visual Field Defect</span>';
+  }
   sliderTouched = false;
   sliderTouched2 = false;
   vfTestAnswer = null;
@@ -1335,14 +1294,6 @@ function loadCase(idx){
       setVFTest(saved.vf_test_ordered);
     }
 
-    // Q3 hemifield (session A only)
-    if(currentSession === 'A'){
-      if(saved.hemifield !== null && saved.hemifield !== undefined && saved.hemifield !== ''){
-        setHemifield(saved.hemifield);
-      } else {
-        resetHemifield();
-      }
-    }
   } else {
     // Reset all three questions
     sliderTouched = false;
@@ -1376,9 +1327,6 @@ function loadCase(idx){
     document.getElementById('btn-vf-no').style.color = 'var(--text-muted)';
     document.getElementById('vf-hint').textContent = 'Please select Yes or No';
     document.getElementById('vf-hint').style.color = 'var(--text-dim)';
-
-    // Q3 (session A) — hemifield reset
-    resetHemifield();
   }
   setRespStatus(!!saved);
   var btn = document.getElementById('btn-submit');
@@ -1605,32 +1553,6 @@ function setVFTest(val){
   }
 }
 
-function setHemifield(val){
-  hemifieldAnswer = val;
-  var map = { superior:'btn-hemi-sup', inferior:'btn-hemi-inf', both:'btn-hemi-both' };
-  ['btn-hemi-sup','btn-hemi-inf','btn-hemi-both'].forEach(function(id){
-    var b = document.getElementById(id);
-    b.style.background = 'transparent';
-    b.style.color = 'var(--text-muted)';
-  });
-  var sel = document.getElementById(map[val]);
-  sel.style.background = 'var(--accent)';
-  sel.style.color = '#000';
-  var hint = document.getElementById('hemi-hint');
-  hint.textContent = 'Hemifield: ' + val.charAt(0).toUpperCase() + val.slice(1);
-  hint.style.color = 'var(--accent)';
-}
-
-function resetHemifield(){
-  hemifieldAnswer = null;
-  ['btn-hemi-sup','btn-hemi-inf','btn-hemi-both'].forEach(function(id){
-    var b = document.getElementById(id);
-    if(b){ b.style.background='transparent'; b.style.color='var(--text-muted)'; }
-  });
-  var hint = document.getElementById('hemi-hint');
-  if(hint){ hint.textContent='Select superior, inferior, or both'; hint.style.color='var(--text-dim)'; }
-}
-
 // ── NAVIGATION ─────────────────────────────────────────────
 function navigate(dir){
   var ni=currentIndex+dir;
@@ -1665,15 +1587,8 @@ function attemptSubmit(){
     setTimeout(function(){ document.getElementById('login-error').style.display='none'; }, 3000);
     return;
   }
-  if(currentSession === 'A' && hemifieldAnswer === null){
-    document.getElementById('login-error').textContent = 'Please answer Question 3 (Hemifield) before submitting.';
-    document.getElementById('login-error').style.display = 'block';
-    setTimeout(function(){ document.getElementById('login-error').style.display='none'; }, 3000);
-    return;
-  }
   if(vfTestAnswer === null){
-    var qNum = (currentSession === 'A') ? '4' : '3';
-    document.getElementById('login-error').textContent = 'Please answer Question ' + qNum + ' (Visual Field Test) before submitting.';
+    document.getElementById('login-error').textContent = 'Please answer Question 3 (Visual Field Testing) before submitting.';
     document.getElementById('login-error').style.display = 'block';
     setTimeout(function(){ document.getElementById('login-error').style.display='none'; }, 3000);
     return;
@@ -1700,7 +1615,6 @@ function commitGrade(caseId,score){
     score:           score,
     structural_score: scoreStruct,
     vf_test_ordered:  vfTestAnswer,
-    hemifield:       (currentSession === 'A') ? hemifieldAnswer : null,
     timestamp:       ts(),
     caseStart:       caseStartTime,
     sessionStart:    sessionStartTime
@@ -1728,7 +1642,6 @@ async function submitToGoogleSheets(caseId, score){
     structural_score:        scoreStruct,
     likelihood_score:        score,
     vf_test_ordered:         vfTestAnswer,
-    hemifield:               (currentSession === 'A') ? hemifieldAnswer : null,
     timestamp_submitted:     ts(),
     timestamp_case_start:    caseStartTime,
     timestamp_session_start: sessionStartTime
