@@ -1688,12 +1688,20 @@ function exportCSV(silent){
     ['Study','ARGUS Stage 0'],['Reader ID',readerId],['Export Date',ts()],[]
   ];
   ['A','B','C','D'].forEach(function(sess){
+    var isA = (sess === 'A');
+    // Session-aware column headers for the two sliders
+    var q1Head = isA ? 'Superior Hemifield GVFD (%)' : 'Structural Damage (%)';
+    var q2Head = isA ? 'Inferior Hemifield GVFD (%)' : 'Visual Field Defect (%)';
     rows.push(['--- SESSION '+sess+' ---']);
-    rows.push(['Case ID','Likelihood Score (%)','Session Start','Case Start','Submitted']);
+    rows.push(['Case ID', q1Head, q2Head, 'VF Testing Indicated', 'Session Start','Case Start','Submitted']);
     SESSIONS[sess].forEach(function(c){
       var r=responses[sess][c.id];
-      if(r){ rows.push([c.id,r.score,r.sessionStart||'',r.caseStart||'',r.timestamp]); }
-      else { rows.push([c.id,'NOT ASSESSED','','','']); }
+      if(r){
+        var q1 = (r.structural_score !== null && r.structural_score !== undefined) ? r.structural_score : '';
+        var q3 = (r.vf_test_ordered === true) ? 'Yes' : (r.vf_test_ordered === false) ? 'No' : '';
+        rows.push([c.id, q1, r.score, q3, r.sessionStart||'', r.caseStart||'', r.timestamp]);
+      }
+      else { rows.push([c.id,'NOT ASSESSED','','','','','']); }
     });
     rows.push([]);
   });
